@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>北海道親子自駕 2026・秘境版 V2（新千歲環狀）</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', 'Noto Sans TC', sans-serif;
+      background: #f5f5f5;
+      display: flex; flex-direction: column;
+      height: 100vh; height: 100dvh;
+      overflow: hidden;
+    }
+
+    header {
+      background: linear-gradient(135deg, #1a4a8c 0%, #2d72d9 100%);
+      color: white; padding: 10px 20px;
+      display: flex; align-items: center; justify-content: space-between; flex-shrink: 0;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    }
+    header h1 { font-size: 17px; font-weight: 700; }
+    header p  { font-size: 11px; opacity: 0.85; margin-top: 2px; }
+    .header-badges { display: flex; gap: 8px; flex-shrink: 0; }
+    .badge { background: rgba(255,255,255,0.2); border-radius: 20px; padding: 4px 10px; font-size: 11px; white-space: nowrap; }
+
+    .main { display: flex; flex: 1; overflow: hidden; }
+
+    #sidebar {
+      width: 320px; min-width: 290px;
+      background: #fff; overflow-y: auto;
+      border-right: 1px solid #ddd;
+      display: flex; flex-direction: column;
+    }
+
+    .filter-bar {
+      padding: 8px 10px; background: #f8f8f8;
+      border-bottom: 1px solid #eee;
+      display: flex; flex-wrap: wrap; gap: 5px; flex-shrink: 0;
+    }
+    .filter-bar button {
+      border: none; border-radius: 20px; padding: 5px 12px;
+      font-size: 12px; cursor: pointer; font-weight: 700;
+      opacity: 0.45; transition: opacity .2s, transform .1s;
+      touch-action: manipulation;
+    }
+    .filter-bar button.active { opacity: 1; transform: scale(1.08); box-shadow: 0 2px 6px rgba(0,0,0,0.25); }
+
+    .hotel-change {
+      display: flex; align-items: center; gap: 8px;
+      padding: 6px 12px; font-size: 11px; font-weight: 600;
+      border-bottom: 1px solid #eee;
+    }
+    .hotel-change.h1       { background: #fdecea; color: #c0392b; }
+    .hotel-change.h2       { background: #f3e9f7; color: #6c3483; }
+    .hotel-change.h3       { background: #e0f2f1; color: #00695c; }
+    .hotel-change.transfer { background: #fff8e1; color: #b45309; }
+
+    .day-block { border-bottom: 1px solid #eee; }
+    .day-header {
+      display: flex; align-items: center; gap: 9px;
+      padding: 11px 13px; cursor: pointer; transition: background .15s;
+      min-height: 48px;
+    }
+    .day-header:hover { background: #f5f5f5; }
+    .day-badge {
+      width: 34px; height: 34px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      color: white; font-weight: 700; font-size: 12px; flex-shrink: 0;
+    }
+    .day-title { flex: 1; }
+    .day-title strong { font-size: 13px; display: block; }
+    .day-title span    { font-size: 11px; color: #777; }
+    .spot-count {
+      font-size: 10px; font-weight: 700; color: #fff;
+      background: #95a5a6; border-radius: 10px; padding: 2px 8px;
+      flex-shrink: 0; white-space: nowrap;
+    }
+    .day-chevron { font-size: 12px; color: #aaa; transition: transform .2s; padding: 8px; }
+    .day-block.open .day-chevron { transform: rotate(90deg); }
+
+    .day-spots { display: none; padding: 5px 9px 10px; }
+    .day-block.open .day-spots { display: block; }
+
+    .spot-card {
+      border-radius: 8px; padding: 10px 12px; margin-bottom: 8px;
+      cursor: pointer; border: 1px solid #eee; border-left-width: 3px;
+      transition: box-shadow .15s; background: #fafafa;
+      touch-action: manipulation;
+    }
+    .spot-card:active { box-shadow: 0 2px 8px rgba(0,0,0,.15); }
+    .spot-card h4 { font-size: 13px; margin-bottom: 4px; }
+    .spot-card p  { font-size: 12px; color: #666; line-height: 1.5; margin-bottom: 6px; }
+
+    .warn { font-size: 11px; color: #c0392b; background: #fef0ef; border-radius: 4px; padding: 4px 7px; margin-bottom: 6px; display: inline-block; }
+    .pair { font-size: 11px; color: #1e8449; background: #eafaf1; border-radius: 4px; padding: 4px 7px; margin-bottom: 6px; display: inline-block; }
+    .secret { font-size: 11px; color: #7d3c98; background: #f5eef8; border-radius: 4px; padding: 4px 7px; margin-bottom: 6px; display: inline-block; }
+
+    .yt-links { display: flex; flex-direction: column; gap: 5px; }
+    .yt-link {
+      display: flex; align-items: center; gap: 6px;
+      font-size: 12px; color: #cc0000; text-decoration: none;
+      padding: 6px 8px; border-radius: 6px;
+      background: #fff5f5; border: 1px solid #fcc;
+      transition: background .15s; word-break: break-word;
+      min-height: 36px;
+    }
+    .yt-link:hover, .yt-link:active { background: #ffe0e0; }
+    .yt-icon { flex-shrink: 0; width: 16px; height: 16px; }
+
+    #map { flex: 1; z-index: 0; }
+
+    .lf-popup .popup-title { font-size: 14px; font-weight: 700; margin-bottom: 5px; }
+    .lf-popup .popup-day   { font-size: 11px; color: #fff; padding: 2px 8px; border-radius: 10px; display: inline-block; margin-bottom: 7px; }
+    .lf-popup .popup-desc  { font-size: 12px; color: #444; margin-bottom: 8px; line-height: 1.55; }
+    .lf-popup .popup-warn  { font-size: 11px; color: #c0392b; background: #fef0ef; border-radius: 4px; padding: 4px 7px; margin-bottom: 7px; }
+    .lf-popup .popup-pair  { font-size: 11px; color: #1e8449; background: #eafaf1; border-radius: 4px; padding: 4px 7px; margin-bottom: 7px; }
+    .lf-popup .popup-secret{ font-size: 11px; color: #7d3c98; background: #f5eef8; border-radius: 4px; padding: 4px 7px; margin-bottom: 7px; }
+    .lf-popup .popup-yt    { display: flex; flex-direction: column; gap: 5px; }
+    .lf-popup .popup-yt a  {
+      display: flex; align-items: center; gap: 6px;
+      font-size: 12px; color: #cc0000; text-decoration: none;
+      padding: 5px 8px; border-radius: 5px;
+      background: #fff5f5; border: 1px solid #fcc;
+    }
+    .lf-popup .popup-yt a:hover { background: #ffe0e0; }
+
+    .legend {
+      position: absolute; bottom: 28px; right: 10px; z-index: 1000;
+      background: white; border-radius: 8px; padding: 10px 13px;
+      box-shadow: 0 2px 10px rgba(0,0,0,.2); font-size: 11px; max-width: 200px;
+    }
+    .legend-title { font-weight: 700; margin-bottom: 6px; font-size: 12px; }
+    .legend-item  { display: flex; align-items: center; gap: 6px; margin-bottom: 3px; }
+    .legend-dot   { width: 11px; height: 11px; border-radius: 50%; flex-shrink: 0; }
+    .legend-sep   { border-top: 1px dashed #ddd; margin: 5px 0; font-size: 10px; color: #999; }
+
+    .hotel-strip { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); z-index: 1000; display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; max-width: 90%; }
+    .hotel-chip  { background: white; border-radius: 20px; padding: 4px 12px; font-size: 11px; font-weight: 600; box-shadow: 0 2px 8px rgba(0,0,0,.2); white-space: nowrap; }
+    .hotel-chip.h1 { border-left: 4px solid #e74c3c; color: #c0392b; }
+    .hotel-chip.h2 { border-left: 4px solid #8e44ad; color: #6c3483; }
+    .hotel-chip.h3 { border-left: 4px solid #16a085; color: #00695c; }
+
+    /* ════ MOBILE ≤767px ════ */
+    @media (max-width: 767px) {
+      header { padding: 8px 14px; }
+      header h1 { font-size: 14px; }
+      header p  { font-size: 10px; }
+      .header-badges { display: none; }
+
+      .main { flex-direction: column; }
+      #map { flex: none; height: 48vh; width: 100%; }
+      #sidebar {
+        width: 100%; min-width: unset; flex: 1;
+        border-right: none; border-top: 2px solid #ddd;
+        overflow-y: auto; -webkit-overflow-scrolling: touch;
+      }
+      #sidebar::before {
+        content: ''; display: block;
+        width: 40px; height: 4px; background: #ccc; border-radius: 2px;
+        margin: 8px auto 4px;
+      }
+      .filter-bar {
+        flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch;
+        padding: 8px 12px; gap: 6px; scrollbar-width: none;
+      }
+      .filter-bar::-webkit-scrollbar { display: none; }
+      .filter-bar button { padding: 6px 14px; font-size: 12px; white-space: nowrap; flex-shrink: 0; }
+
+      .day-header { padding: 12px 14px; min-height: 52px; }
+      .day-title strong { font-size: 14px; }
+      .spot-card { padding: 12px 13px; margin-bottom: 10px; }
+      .spot-card h4 { font-size: 14px; }
+      .yt-link { font-size: 12px; padding: 7px 9px; min-height: 40px; }
+
+      .legend, .hotel-strip { display: none; }
+
+      .leaflet-popup-content { margin: 12px 14px !important; }
+      .lf-popup .popup-title { font-size: 15px; }
+      .lf-popup .popup-yt a  { font-size: 12px; padding: 7px 9px; min-height: 38px; }
+    }
+    @media (max-width: 374px) {
+      #map { height: 44vh; }
+      header h1 { font-size: 13px; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>🗾 北海道親子自駕 2026・秘境版 V2</h1>
+    <p>7/2（四）IT234 11:05抵達 → 7/9（四）IT235 12:05回國 ｜ 三大兩小（4歲・2歲）</p>
+  </div>
+  <div class="header-badges">
+    <span class="badge">🏨 3飯店・換2次</span>
+    <span class="badge">🔍 冷門秘境版</span>
+  </div>
+</header>
+
+<div class="main">
+  <div id="sidebar">
+    <div class="filter-bar" id="filterBar">
+      <button data-day="all" class="active" style="background:#555;color:#fff;">全部</button>
+    </div>
+    <div id="dayList"></div>
+  </div>
+  <div id="map"></div>
+</div>
+
+<script>
+// ─────────────────────────────────────────────
+// DATA（新千歲環狀・秘境版 V2・幾乎無外國觀光客）
+// ─────────────────────────────────────────────
+const DAYS = [
+  {
+    day: 1, date: "7/2（四）", label: "抵達→富良野", color: "#e74c3c",
+    spotCount: "景點×1", hotelTag: "h1", hotelLabel: "🏨 飯店① 富良野・新富良野王子（連住3晚）",
+    spots: [
+      {
+        id: "cts_in", name: "新千歲機場 抵達", icon: "🛬",
+        lat: 42.7752, lng: 141.6921,
+        desc: "IT234 11:05 落地。出關+提行李+取車約1.5hr → 約13:00上路，開往富良野約2hr，15:30抵達",
+        videos: [
+          { title: "新千歲機場攻略・哆啦A夢・美食（中文）", url: "https://www.youtube.com/results?search_query=新千歲機場+攻略+親子+哆啦A夢" }
+        ]
+      },
+      {
+        id: "ningle", name: "森林精靈露台（ニングルテラス）", icon: "🌲",
+        lat: 43.3219, lng: 142.3854,
+        desc: "新富良野王子飯店內的秘境森林手作商店街。12棟木屋工坊點燈後如童話仙境，販售職人木工・玻璃・皮革手作品。幾乎沒有外國觀光客，飯店附天然溫泉，第一天輕鬆入門",
+        secret: "🔍 秘境度★★★ 日本本地家庭客為主，幾乎無外國遊客",
+        videos: [
+          { title: "ニングルテラス 夜の散策・幻想的な森（日文）", url: "https://www.youtube.com/results?search_query=ニングルテラス+夜+散策+富良野" },
+          { title: "新富良野プリンスホテル・温泉＋ニングルテラス（日文）", url: "https://www.youtube.com/results?search_query=新富良野プリンスホテル+ニングルテラス+子連れ" }
+        ]
+      }
+    ]
+  },
+  {
+    day: 2, date: "7/3（五）", label: "十勝岳火山・チーズ工房", color: "#e67e22",
+    spotCount: "景點×2", hotelTag: "h1", hotelLabel: "🏨 飯店① 富良野（連住）",
+    spots: [
+      {
+        id: "tokachidake", name: "十勝岳望岳台", icon: "🌋",
+        lat: 43.3757, lng: 142.6809,
+        desc: "海拔930m的活火山展望台，荒涼的火山岩石地貌宛如置身月球表面！雄大的十勝岳連峰近在眼前，硫磺噴氣孔清晰可見。從富良野出發約40分鐘，停車場免費，幾乎沒有外國觀光客的北海道真正大自然",
+        secret: "🔍 秘境度★★★★ 外國觀光客極少，純粹的大雪山麓火山景觀",
+        videos: [
+          { title: "十勝岳望岳台・活火山の大地を歩く 4K（日文）", url: "https://www.youtube.com/results?search_query=十勝岳+望岳台+夏+絶景+火山" },
+          { title: "上富良野・十勝岳登山口 望岳台から見る絶景（日文）", url: "https://www.youtube.com/results?search_query=十勝岳+望岳台+上富良野+景色" }
+        ]
+      },
+      {
+        id: "cheese_kobo", name: "富良野チーズ工房", icon: "🧀",
+        lat: 43.3409, lng: 142.4106,
+        desc: "免費參觀的起司・奶油・葡萄酒工坊，可付費預約自製奶油體驗（約20分鐘）！孩子最愛現做軟冰淇淋，農業感濃厚，來客幾乎全是日本本地家庭。下午時段人少最佳",
+        secret: "🔍 秘境度★★★ 遊客少，比青池人潮少90%",
+        videos: [
+          { title: "富良野チーズ工房・バター手作り体験と見学（日文）", url: "https://www.youtube.com/results?search_query=富良野チーズ工房+体験+見学+子ども" }
+        ]
+      }
+    ]
+  },
+  {
+    day: 3, date: "7/4（六）", label: "層雲峡大峽谷", color: "#f39c12",
+    spotCount: "景點×1+", hotelTag: "h1", hotelLabel: "🏨 飯店① 富良野（連住）",
+    spots: [
+      {
+        id: "sounkyo", name: "層雲峡・銀河＆流星の滝", icon: "🏞️",
+        lat: 43.8085, lng: 143.0481,
+        desc: "大雪山國立公園核心秘境！高達100m的柱狀熔岩峽谷壁夾道，「銀河瀑布」與「流星瀑布」雙瀑並立，從停車場步行10-15分鐘即達。峽谷本身的壯觀程度超越旭山動物園，幾乎全是日本本地登山客，外國遊客罕見。富良野往返約4.5hr（來回共180km，建議早出發）",
+        pair: "🔗 銀河瀑布・流星瀑布相距500m可一次逛完；餘力可加搭黑岳纜車（30分）看高山雲海",
+        secret: "🔍 秘境度★★★★★ 外國觀光客極少，大雪山真正的秘境",
+        videos: [
+          { title: "層雲峡・銀河の滝・流星の滝 北海道最強秘境（日文）", url: "https://www.youtube.com/results?search_query=層雲峡+銀河の滝+流星の滝+夏" },
+          { title: "黒岳ロープウェイ・高山植物と雲海・大雪山（日文）", url: "https://www.youtube.com/results?search_query=黒岳ロープウェイ+夏+雲海+大雪山" }
+        ]
+      }
+    ]
+  },
+  {
+    day: 4, date: "7/5（日）", label: "富良野→頭大仏→札幌", color: "#9b59b6",
+    spotCount: "景點×1", hotelTag: "transfer", hotelLabel: "🚗 移動日 → 飯店② 札幌（連住2晚）",
+    spots: [
+      {
+        id: "hill_buddha", name: "頭大仏（滝野霊園）", icon: "🙏",
+        lat: 42.9660, lng: 141.3835,
+        desc: "安藤忠雄設計的隱秘建築傑作！13.5m的巨大佛頭從薰衣草丘陵中探出（7月正值盛開），蓮花穹頂長廊引導入場，光與影的空間體驗震撼人心。在富良野→札幌的路上，門票¥500，幾乎無外國觀光客，是真正的隱藏版秘景",
+        secret: "🔍 秘境度★★★★ 全球最被低估的安藤忠雄作品，外國人幾乎不知道",
+        videos: [
+          { title: "頭大仏殿・安藤忠雄の隠れた名作・薰衣草との共演（日文）", url: "https://www.youtube.com/results?search_query=頭大仏+滝野霊園+安藤忠雄+ラベンダー" },
+          { title: "北海道・滝野霊園 頭大仏 穴場スポット（日文）", url: "https://www.youtube.com/results?search_query=滝野霊園+頭大仏+穴場+観光" }
+        ]
+      }
+    ]
+  },
+  {
+    day: 5, date: "7/6（一）", label: "余市・積丹ブルー", color: "#8e44ad",
+    spotCount: "景點×2", hotelTag: "h2", hotelLabel: "🏨 飯店② 札幌（連住）",
+    spots: [
+      {
+        id: "nikka", name: "余市・ニッカウヰスキー蒸留所", icon: "🏯",
+        lat: 43.1850, lng: 140.7794,
+        desc: "1934年創業、日本威士忌傳奇的誕生地。蘇格蘭風格石造建築群極美，免費參觀廠區！蒸餾室・熟成倉庫・試飲館，大人可試飲余市單一麥芽，孩子有免費蘋果汁。整個余市町充滿昭和氣息，日本NHK電視劇《Massan》拍攝地，幾乎無外國觀光客",
+        secret: "🔍 秘境度★★★ 外國遊客少，免費入場，性價比極高",
+        videos: [
+          { title: "ニッカウヰスキー余市蒸留所・無料見学完全ガイド（日文）", url: "https://www.youtube.com/results?search_query=ニッカウヰスキー+余市+蒸留所+見学+無料" },
+          { title: "北海道・余市観光・海産物＋ニッカ蒸留所（日文）", url: "https://www.youtube.com/results?search_query=余市+観光+ニッカ+海産物" }
+        ]
+      },
+      {
+        id: "shimamui", name: "積丹・島武意海岸", icon: "🌊",
+        lat: 43.2791, lng: 140.5906,
+        desc: "「積丹藍（Shakotan Blue）」令人屏息！穿過100m隧道豁然開朗，翡翠藍的透明海灣，海蝕洞・白沙灘・搖曳的海藻清晰可見。全日本最美的海水之一，距離余市約30分鐘，外國遊客幾乎為零。不建議游泳（離流），視覺享受就值回票價",
+        secret: "🔍 秘境度★★★★★ 外國人極少知道，積丹藍完全不輸沖繩",
+        videos: [
+          { title: "積丹・島武意海岸 神秘碧藍秘境 4K（日文）", url: "https://www.youtube.com/results?search_query=積丹+島武意海岸+青い海+絶景" },
+          { title: "積丹半島ドライブ・積丹ブルーの海岸線（日文）", url: "https://www.youtube.com/results?search_query=積丹半島+ドライブ+積丹ブルー+海" }
+        ]
+      }
+    ]
+  },
+  {
+    day: 6, date: "7/7（二）", label: "地球岬・クッタラ湖→洞爺湖", color: "#2980b9",
+    spotCount: "景點×2", hotelTag: "transfer", hotelLabel: "🚗 移動日 → 飯店③ 洞爺湖（連住2晚）",
+    spots: [
+      {
+        id: "earth_cape", name: "地球岬（室蘭）", icon: "🌍",
+        lat: 42.3110, lng: 141.0040,
+        desc: "站在100m高斷崖眺望，因海平線弧度能實際感受地球曲率而得名「地球岬」。兩座白色燈塔矗立崖邊，無邊際的太平洋，晴天可見駒ヶ岳。從札幌約1.5hr，是室蘭在地人才知道的絕景。幾乎無外國觀光客，免費停車",
+        secret: "🔍 秘境度★★★★ 室蘭是工業城市很少人去，但地球岬景色震撼",
+        videos: [
+          { title: "地球岬・室蘭の秘境岬 ほぼ無人の絶景（日文）", url: "https://www.youtube.com/results?search_query=地球岬+室蘭+灯台+絶景" },
+          { title: "北海道室蘭市・地球岬から見る水平線（日文）", url: "https://www.youtube.com/results?search_query=室蘭+地球岬+観光+ドライブ" }
+        ]
+      },
+      {
+        id: "kuttara", name: "クッタラ湖（透明度日本一の火口湖）", icon: "💧",
+        lat: 42.5139, lng: 141.2019,
+        desc: "透明度日本第一的完美圓形火口湖！湖畔幾乎沒有開發，只有一個展望台可俯瞰，深邃的藍黑色湖面神秘壯觀，沒有遊覧船、沒有商店街，就是純粹的秘境體驗。登別熊牧場旁僅3km，幾乎所有觀光客都不知道這個湖的存在",
+        secret: "🔍 秘境度★★★★★ 透明度日本第一卻少人知，真正的秘境",
+        videos: [
+          { title: "クッタラ湖・透明度日本一の火口湖 秘境探訪（日文）", url: "https://www.youtube.com/results?search_query=クッタラ湖+透明度+日本一+秘境" }
+        ]
+      }
+    ]
+  },
+  {
+    day: 7, date: "7/8（三）", label: "有珠山噴火遺跡・洞爺湖煙火", color: "#16a085",
+    spotCount: "景點×2", hotelTag: "h3", hotelLabel: "🏨 飯店③ 洞爺湖（連住）",
+    spots: [
+      {
+        id: "usu_crater", name: "有珠山西山火口散策路（免費）", icon: "🌋",
+        lat: 42.5314, lng: 140.8190,
+        desc: "2000年有珠山噴火災害遺跡！完全免費的戶外散步道（約30-40分鐘），被溶岩吞沒的道路、地面隆起扭曲的住宅、埋入地下的車輛和柏油路，宛如時間靜止的末日場景。比付費纜車更震撼的真實感，孩子會目瞪口呆。幾乎無外國觀光客",
+        secret: "🔍 秘境度★★★★ 比有珠山纜車更震撼且免費，幾乎沒有外國遊客知道",
+        videos: [
+          { title: "有珠山西山火口散策路・2000年噴火の生々しい痕跡（日文）", url: "https://www.youtube.com/results?search_query=有珠山+西山火口+散策路+2000年噴火+跡" },
+          { title: "洞爺湖・有珠山噴火遺構を歩く（日文）", url: "https://www.youtube.com/results?search_query=有珠山+西山火口+遺構+洞爺湖" }
+        ]
+      },
+      {
+        id: "toya_fireworks", name: "洞爺湖遊覧船 ＋ 湖上煙火🎆", icon: "⛴️",
+        lat: 42.5606, lng: 140.8407,
+        desc: "中島巡遊約30-50分鐘，湖風涼爽，孩子坐船很開心。湖畔有免費足湯可以泡腳。晚上20:45湖上煙火🎆（4月-10月每晚舉辦！房間就能看到），洞爺湖是全北海道最值得住一晚的溫泉地",
+        videos: [
+          { title: "洞爺湖・毎晩開催の湖上花火と遊覧船（日文）", url: "https://www.youtube.com/results?search_query=洞爺湖+花火+毎晩+遊覧船+温泉" },
+          { title: "洞爺湖温泉・足湯散策と夜の花火（日文）", url: "https://www.youtube.com/results?search_query=洞爺湖温泉+足湯+花火+夜景" }
+        ]
+      }
+    ]
+  },
+  {
+    day: 8, date: "7/9（四）", label: "回程", color: "#7f8c8d",
+    spotCount: "回程日", hotelTag: "h3", hotelLabel: "✈️ 洞爺湖退房 → 新千歲回國",
+    spots: [
+      {
+        id: "cts_out", name: "新千歲機場 回國", icon: "🛫",
+        lat: 42.7752, lng: 141.6921,
+        desc: "IT235 12:05 起飛。需10:00報到 → 9:30還車 → 8:00離洞爺湖（洞爺→機場約1.25hr）。早上純移動，無觀光時間。機場3F哆啦A夢樂園・拉麵道場・甜點街可好好掃貨",
+        warn: "⚠️ 班機早，7/9上午是移動日，洞爺湖必須早起7:30前出發",
+        videos: [
+          { title: "新千歲機場・哆啦A夢樂園・拉麵道場・甜點攻略（中文）", url: "https://www.youtube.com/results?search_query=新千歲機場+哆啦A夢樂園+美食+攻略" }
+        ]
+      }
+    ]
+  }
+];
+
+// ─────────────────────────────────────────────
+// MAP INIT
+// ─────────────────────────────────────────────
+const map = L.map('map').setView([43.2, 141.8], 8);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  attribution: '© OpenStreetMap contributors', maxZoom: 18
+}).addTo(map);
+
+function makeIcon(color, emoji) {
+  return L.divIcon({
+    className: '',
+    html: `<div style="width:36px;height:36px;border-radius:50%;background:${color};border:3px solid white;box-shadow:0 2px 8px rgba(0,0,0,.35);display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer;">${emoji}</div>`,
+    iconSize: [36, 36], iconAnchor: [18, 18], popupAnchor: [0, -22]
+  });
+}
+function ytSvg() {
+  return `<svg class="yt-icon" viewBox="0 0 24 24" fill="#cc0000"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.6 12 3.6 12 3.6s-7.5 0-9.4.5A3 3 0 0 0 .5 6.2C0 8.1 0 12 0 12s0 3.9.5 5.8a3 3 0 0 0 2.1 2.1c1.9.5 9.4.5 9.4.5s7.5 0 9.4-.5a3 3 0 0 0 2.1-2.1C24 15.9 24 12 24 12s0-3.9-.5-5.8zM9.7 15.5V8.5l6.3 3.5-6.3 3.5z"/></svg>`;
+}
+
+const dayLayers  = {};
+const dayListEl  = document.getElementById('dayList');
+const filterBar  = document.getElementById('filterBar');
+
+DAYS.forEach(d => {
+  const layer = L.layerGroup().addTo(map);
+  dayLayers[d.day] = layer;
+  const coords = [];
+
+  const btn = document.createElement('button');
+  btn.textContent = `D${d.day}`;
+  btn.dataset.day = d.day;
+  btn.style.cssText = `background:${d.color};color:#fff;`;
+  filterBar.appendChild(btn);
+
+  const block = document.createElement('div');
+  block.className = 'day-block';
+  block.id = `day-block-${d.day}`;
+  block.innerHTML = `
+    <div class="hotel-change ${d.hotelTag}"><span>${d.hotelLabel}</span></div>
+    <div class="day-header" onclick="toggleDay(${d.day})">
+      <div class="day-badge" style="background:${d.color}">D${d.day}</div>
+      <div class="day-title">
+        <strong>${d.label}</strong>
+        <span>${d.date}</span>
+      </div>
+      <span class="spot-count" style="background:${d.color}">${d.spotCount}</span>
+      <span class="day-chevron">▶</span>
+    </div>
+    <div class="day-spots" id="spots-${d.day}"></div>
+  `;
+  dayListEl.appendChild(block);
+  const spotsEl = document.getElementById(`spots-${d.day}`);
+
+  d.spots.forEach(s => {
+    coords.push([s.lat, s.lng]);
+
+    const marker = L.marker([s.lat, s.lng], { icon: makeIcon(d.color, s.icon) });
+    const ytPopup = s.videos.map(v => `<a href="${v.url}" target="_blank">${ytSvg()} ${v.title}</a>`).join('');
+    const warnPopup  = s.warn   ? `<div class="popup-warn">${s.warn}</div>`   : '';
+    const pairPopup  = s.pair   ? `<div class="popup-pair">${s.pair}</div>`   : '';
+    const secretPopup= s.secret ? `<div class="popup-secret">${s.secret}</div>` : '';
+    marker.bindPopup(`
+      <div class="lf-popup" style="min-width:220px;max-width:280px">
+        <div class="popup-title">${s.icon} ${s.name}</div>
+        <div class="popup-day" style="background:${d.color}">D${d.day} ${d.date}</div>
+        <div class="popup-desc">${s.desc}</div>
+        ${secretPopup}${pairPopup}${warnPopup}
+        <div class="popup-yt">${ytPopup}</div>
+      </div>`, { maxWidth: 300 });
+    marker.addTo(layer);
+
+    const card = document.createElement('div');
+    card.className = 'spot-card';
+    card.style.borderLeftColor = d.color;
+    const warnCard   = s.warn   ? `<span class="warn">${s.warn}</span>`       : '';
+    const pairCard   = s.pair   ? `<span class="pair">${s.pair}</span>`       : '';
+    const secretCard = s.secret ? `<span class="secret">${s.secret}</span>`   : '';
+    const ytLinks = s.videos.map(v => `<a class="yt-link" href="${v.url}" target="_blank">${ytSvg()} ${v.title}</a>`).join('');
+    card.innerHTML = `<h4>${s.icon} ${s.name}</h4><p>${s.desc}</p>${secretCard}${pairCard}${warnCard}<div class="yt-links">${ytLinks}</div>`;
+    card.addEventListener('click', e => {
+      if (e.target.tagName === 'A' || e.target.closest('a')) return;
+      document.getElementById(`day-block-${d.day}`).classList.add('open');
+      map.flyTo([s.lat, s.lng], 13, { duration: 1.2 });
+      marker.openPopup();
+    });
+    spotsEl.appendChild(card);
+  });
+
+  if (coords.length > 1) {
+    L.polyline(coords, { color: d.color, weight: 3, opacity: 0.75, dashArray: '8,5' }).addTo(layer);
+  }
+});
+
+// Grey connectors between days
+for (let i = 0; i < DAYS.length - 1; i++) {
+  const from = DAYS[i].spots[DAYS[i].spots.length - 1];
+  const to   = DAYS[i+1].spots[0];
+  L.polyline([[from.lat, from.lng],[to.lat, to.lng]], { color: '#bbb', weight: 2, opacity: 0.55, dashArray: '4,8' }).addTo(map);
+}
+
+// Legend
+const leg = document.createElement('div');
+leg.className = 'legend';
+leg.innerHTML = `<div class="legend-title">📅 行程天數（V2 秘境版）</div>` +
+  DAYS.map(d => `<div class="legend-item"><div class="legend-dot" style="background:${d.color}"></div><span>D${d.day} ${d.label}</span></div>`).join('') +
+  `<div class="legend-sep">── 住宿（換2次）</div>
+   <div class="legend-item"><div class="legend-dot" style="background:#e74c3c"></div><span>① 富良野 (D1-D3)</span></div>
+   <div class="legend-item"><div class="legend-dot" style="background:#8e44ad"></div><span>② 札幌 (D4-D5)</span></div>
+   <div class="legend-item"><div class="legend-dot" style="background:#16a085"></div><span>③ 洞爺湖 (D6-D7)</span></div>`;
+document.getElementById('map').appendChild(leg);
+
+// Hotel strip
+const strip = document.createElement('div');
+strip.className = 'hotel-strip';
+strip.innerHTML = `
+  <div class="hotel-chip h1">🏨① 富良野 D1-D3</div>
+  <div class="hotel-chip h2">🏨② 札幌 D4-D5</div>
+  <div class="hotel-chip h3">🏨③ 洞爺湖 D6-D7</div>`;
+document.getElementById('map').appendChild(strip);
+
+// Filter
+filterBar.addEventListener('click', e => {
+  const btn = e.target.closest('button');
+  if (!btn) return;
+  const day = btn.dataset.day;
+  document.querySelectorAll('.filter-bar button').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+
+  if (day === 'all') {
+    Object.values(dayLayers).forEach(l => map.addLayer(l));
+    map.flyTo([43.2, 141.8], 8, { duration: 1 });
+    document.querySelectorAll('.day-block').forEach(b => b.classList.remove('open'));
+    document.getElementById('day-block-1').classList.add('open');
+  } else {
+    Object.entries(dayLayers).forEach(([dd, l]) => day === dd ? map.addLayer(l) : map.removeLayer(l));
+    const d = DAYS.find(x => x.day == day);
+    if (d) {
+      const mid = d.spots[Math.floor(d.spots.length / 2)];
+      map.flyTo([mid.lat, mid.lng], 11, { duration: 1 });
+    }
+    document.querySelectorAll('.day-block').forEach(b => b.classList.remove('open'));
+    const t = document.getElementById(`day-block-${day}`);
+    if (t) t.classList.add('open');
+  }
+});
+
+function toggleDay(day) {
+  document.getElementById(`day-block-${day}`).classList.toggle('open');
+}
+
+document.getElementById('day-block-1').classList.add('open');
+</script>
+</body>
+</html>
