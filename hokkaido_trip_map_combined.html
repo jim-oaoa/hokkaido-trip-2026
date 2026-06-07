@@ -73,9 +73,9 @@
       border-bottom: 1px solid #eee;
     }
     .hotel-change.h1       { background: #fdecea; color: #c0392b; }
-    .hotel-change.h2       { background: #f3e9f7; color: #6c3483; }
+    .hotel-change.h2       { background: #fef3e2; color: #b45309; }
     .hotel-change.h3       { background: #e0f2f1; color: #00695c; }
-    .hotel-change.transfer { background: #fff8e1; color: #b45309; }
+    .hotel-change.transfer { background: #f3e9f7; color: #6c3483; }
 
     .day-block { border-bottom: 1px solid #eee; }
     .day-header {
@@ -116,6 +116,7 @@
     .warn   { font-size: 11px; color: #c0392b; background: #fef0ef; border-radius: 4px; padding: 4px 7px; margin-bottom: 6px; display: inline-block; }
     .pair   { font-size: 11px; color: #1e8449; background: #eafaf1; border-radius: 4px; padding: 4px 7px; margin-bottom: 6px; display: inline-block; }
     .secret { font-size: 11px; color: #7d3c98; background: #f5eef8; border-radius: 4px; padding: 4px 7px; margin-bottom: 6px; display: inline-block; }
+    .free   { font-size: 11px; color: #1a5276; background: #d6eaf8; border-radius: 4px; padding: 4px 7px; margin-bottom: 6px; display: inline-block; }
 
     .yt-links { display: flex; flex-direction: column; gap: 5px; }
     .yt-link {
@@ -139,6 +140,7 @@
     .lf-popup .popup-warn   { font-size: 11px; color: #c0392b; background: #fef0ef; border-radius: 4px; padding: 4px 7px; margin-bottom: 7px; }
     .lf-popup .popup-pair   { font-size: 11px; color: #1e8449; background: #eafaf1; border-radius: 4px; padding: 4px 7px; margin-bottom: 7px; }
     .lf-popup .popup-secret { font-size: 11px; color: #7d3c98; background: #f5eef8; border-radius: 4px; padding: 4px 7px; margin-bottom: 7px; }
+    .lf-popup .popup-free   { font-size: 11px; color: #1a5276; background: #d6eaf8; border-radius: 4px; padding: 4px 7px; margin-bottom: 7px; }
     .lf-popup .popup-yt     { display: flex; flex-direction: column; gap: 5px; }
     .lf-popup .popup-yt a   {
       display: flex; align-items: center; gap: 6px;
@@ -161,7 +163,7 @@
     .hotel-strip { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); z-index: 1000; display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; max-width: 90%; }
     .hotel-chip  { background: white; border-radius: 20px; padding: 4px 12px; font-size: 11px; font-weight: 600; box-shadow: 0 2px 8px rgba(0,0,0,.2); white-space: nowrap; }
     .hotel-chip.h1 { border-left: 4px solid #e74c3c; color: #c0392b; }
-    .hotel-chip.h2 { border-left: 4px solid #8e44ad; color: #6c3483; }
+    .hotel-chip.h2 { border-left: 4px solid #e67e22; color: #b45309; }
     .hotel-chip.h3 { border-left: 4px solid #16a085; color: #00695c; }
 
     /* ════ MOBILE ≤767px ════ */
@@ -222,7 +224,7 @@
     </div>
     <div class="header-badges">
       <span class="badge">🏨 3飯店・換2次</span>
-      <span class="badge" id="versionBadge">📍 每天≤2景點</span>
+      <span class="badge" id="versionBadge">📍 D2才租車</span>
     </div>
   </div>
 </header>
@@ -239,35 +241,88 @@
 
 <script>
 // ══════════════════════════════════════════════
-//  V1 資料 — 熱門景點版
+//  飯店結構（V1 / V2 共用）
+//  飯店① 札幌  D1-D2（搭電車入住，D2租車）
+//  飯店② 富良野 D3-D5（D3開車移動）
+//  飯店③ 洞爺湖 D6-D7（D6開車移動）
 // ══════════════════════════════════════════════
+
+// ──────────────────────────────────────────────
+//  V1 — 熱門景點版
+// ──────────────────────────────────────────────
 const DAYS_V1 = [
   {
-    day:1, date:"7/2（四）", label:"抵達→富良野", color:"#e74c3c",
-    spotCount:"景點×1", hotelTag:"h1", hotelLabel:"🏨 飯店① 富良野・新富良野王子（連住3晚）",
+    day:1, date:"7/2（四）", label:"抵達→札幌 自由散策", color:"#e74c3c",
+    spotCount:"自由日・無租車", hotelTag:"h1", hotelLabel:"🏨 飯店① 札幌（連住2晚）",
     spots:[
-      { id:"cts_in", name:"新千歲機場 抵達", icon:"🛬",
-        lat:42.7752, lng:141.6921,
-        desc:"IT234 11:05 落地。出關+提行李+取車約1.5hr → 約13:00上路，開往富良野約2hr，15:30抵達",
+      {
+        id:"sapporo_arrive", name:"新千歲→札幌 搭電車入住", icon:"🚃",
+        lat:43.0686, lng:141.3507,
+        desc:"IT234 11:05落地。通關+領行李約45分鐘 → 搭快速エアポート到札幌只要37分！不租車，輕鬆帶孩子入住。午餐在札幌站地下美食街（Stellar Place B2），再抱著孩子去大通公園或狸小路隨興逛",
+        free:"🚶 今天不租車！電車＋計程車移動，孩子累了直接回飯店",
         videos:[
-          { title:"親子北海道自駕vlog・札幌富良野美瑛旭山總覽（日文）", url:"https://www.youtube.com/watch?v=hgUrciDweF4" }
+          { title:"快速エアポート・新千歲→札幌 搭電車完全攻略（日文）", url:"https://www.youtube.com/results?search_query=新千歳空港+快速エアポート+札幌+アクセス" },
+          { title:"札幌駅周辺・親子でおさんぽスポット（日文）", url:"https://www.youtube.com/results?search_query=札幌駅+周辺+子連れ+散歩+おすすめ" }
         ]
       },
-      { id:"ningle", name:"森林精靈露台（ニングルテラス）", icon:"🌲",
-        lat:43.3219, lng:142.3854,
-        desc:"飯店內的森林手作商店街，傍晚點燈夢幻，木屋工房。飯店附溫泉，抵達日輕鬆首選，不用再開車",
+      {
+        id:"odori_tanuki", name:"大通公園・狸小路 散策", icon:"🌳",
+        lat:43.0612, lng:141.3539,
+        desc:"大通公園（綠地廣場，孩子跑跑跳跳）→ 狸小路商店街（室內有頂，逛街吃飯不怕天氣）→ 薄野夜市覓食。不趕時間，感受一下札幌城市氛圍，明天才正式租車出發！",
+        free:"🚶 步行圈景點，從飯店走路可到，完全不需要車",
         videos:[
-          { title:"妖精之森・親子散策 ニングルテラス（日文）", url:"https://www.youtube.com/watch?v=TlTMyDAXa6I" },
-          { title:"富良野市內4小時小旅行・森之時鐘・精靈露台（日文）", url:"https://www.youtube.com/watch?v=eneOdSAT3fE" }
+          { title:"狸小路商店街・サッポロ散歩 子連れ（日文）", url:"https://www.youtube.com/results?search_query=狸小路+商店街+札幌+子連れ+散策" },
+          { title:"札幌大通公園＋テレビ塔・夏の楽しみ方（日文）", url:"https://www.youtube.com/results?search_query=大通公園+テレビ塔+札幌+夏+観光" }
         ]
       }
     ]
   },
   {
-    day:2, date:"7/3（五）", label:"富良野・美瑛", color:"#e67e22",
-    spotCount:"景點×3*", hotelTag:"h1", hotelLabel:"🏨 飯店① 富良野（連住）",
+    day:2, date:"7/3（五）", label:"租車→小樽一日遊", color:"#e67e22",
+    spotCount:"景點×2・今日租車", hotelTag:"h1", hotelLabel:"🏨 飯店① 札幌（連住）",
     spots:[
-      { id:"tomita", name:"富田農場（ファーム富田）", icon:"💜",
+      {
+        id:"otaru_aq", name:"小樽水族館", icon:"🐧",
+        lat:43.2236, lng:140.9870,
+        desc:"今天早上在札幌取車出發！祝津海邊水族館，企鵝遊行・海獅海豚秀，著名的「不聽話企鵝秀」超爆笑，孩子能近距離互動。建議上午看表演場次。札幌→小樽約40分",
+        videos:[
+          { title:"完全不聽話的企鵝秀太有趣了！おたる水族館（日文）", url:"https://www.youtube.com/watch?v=3gltsE39dmI" },
+          { title:"海獅跳水＋自由企鵝秀・半世紀小樽水族館（日文）", url:"https://www.youtube.com/watch?v=NctiI3cv3OY" }
+        ]
+      },
+      {
+        id:"otaru_canal", name:"小樽運河＋堺町通", icon:"🏛️",
+        lat:43.1986, lng:140.9947,
+        desc:"運河與堺町通商店街步行串聯。北一硝子・音樂盒堂・海鮮丼・蒸氣鐘，懷舊街道好拍好逛。晚上回札幌飯店，明天早上出發富良野",
+        pair:"🔗 運河與堺町通步行可達，視為同一區",
+        videos:[
+          { title:"小樽堺町通り・海鮮丼・北一硝子（中文）", url:"https://www.youtube.com/watch?v=5N2OXUlKc4g" },
+          { title:"北海道自由行・浪漫小樽運河商店街（中文）", url:"https://www.youtube.com/watch?v=D8oNoMRYcxw" }
+        ]
+      }
+    ]
+  },
+  {
+    day:3, date:"7/4（六）", label:"移動→富良野・ニングル", color:"#f39c12",
+    spotCount:"移動日＋1景點", hotelTag:"transfer", hotelLabel:"🚗 移動日 → 飯店② 富良野（連住3晚）",
+    spots:[
+      {
+        id:"ningle", name:"森林精靈露台（ニングルテラス）", icon:"🌲",
+        lat:43.3219, lng:142.3854,
+        desc:"札幌→富良野約2.5hr。傍晚抵達，輕鬆入住新富良野王子飯店。飯店內的森林手作商店街點燈後如童話仙境，12棟木屋工坊。不用開車出去，在飯店附近散步逛。附天然溫泉，移動日最輕鬆的選擇",
+        videos:[
+          { title:"妖精の森・ニングルテラス 夜の散策（日文）", url:"https://www.youtube.com/watch?v=TlTMyDAXa6I" },
+          { title:"富良野市内4時間・森の時計・ニングルテラス（日文）", url:"https://www.youtube.com/watch?v=eneOdSAT3fE" }
+        ]
+      }
+    ]
+  },
+  {
+    day:4, date:"7/5（日）", label:"富良野・美瑛", color:"#27ae60",
+    spotCount:"景點×3*", hotelTag:"h2", hotelLabel:"🏨 飯店② 富良野（連住）",
+    spots:[
+      {
+        id:"tomita", name:"富田農場（ファーム富田）", icon:"💜",
         lat:43.4196, lng:142.4731,
         desc:"日本最著名薰衣草農場！7月中旬盛開，免費入場，花圃路徑寬闊推車友善，哈密瓜・薰衣草霜淇淋必吃",
         videos:[
@@ -275,7 +330,8 @@ const DAYS_V1 = [
           { title:"北海道夏季必遊！富田農場薰衣草4K（中文）", url:"https://www.youtube.com/watch?v=iJzj33KmZUg" }
         ]
       },
-      { id:"blue_pond", name:"白金青池", icon:"💙",
+      {
+        id:"blue_pond", name:"白金青池", icon:"💙",
         lat:43.4925, lng:142.6407,
         desc:"夢幻藍色水池，木道平坦15-20分鐘逛完，推車友善",
         pair:"🔗 與白鬚瀑布相隔5分鐘＝算一站",
@@ -284,7 +340,8 @@ const DAYS_V1 = [
           { title:"白金青池 2025年初夏最新 4K（日文）", url:"https://www.youtube.com/watch?v=OuDDMUKnbQ0" }
         ]
       },
-      { id:"shirahige", name:"白鬚瀑布", icon:"🏞️",
+      {
+        id:"shirahige", name:"白鬚瀑布", icon:"🏞️",
         lat:43.4942, lng:142.6629,
         desc:"青池旁5分鐘，從橋上看伏流瀑布注入翡翠藍的美瑛川，與青池一次逛完",
         pair:"🔗 與白金青池相鄰，兩點合計算一站",
@@ -295,12 +352,13 @@ const DAYS_V1 = [
     ]
   },
   {
-    day:3, date:"7/4（六）", label:"旭山動物園", color:"#f39c12",
-    spotCount:"景點×1", hotelTag:"h1", hotelLabel:"🏨 飯店① 富良野（連住）",
+    day:5, date:"7/6（一）", label:"旭山動物園", color:"#2ecc71",
+    spotCount:"景點×1", hotelTag:"h2", hotelLabel:"🏨 飯店② 富良野（連住）",
     spots:[
-      { id:"asahiyama", name:"旭山動物園", icon:"🐧",
+      {
+        id:"asahiyama", name:"旭山動物園", icon:"🐧",
         lat:43.7686, lng:142.4805,
-        desc:"全程最佳親子點！企鵝館・北極熊館・紅毛猩猩空中步道。富良野往返各約1hr，建議待4-5hr，午餐在園內",
+        desc:"全程最佳親子點！企鵝館・北極熊館・紅毛猩猩空中步道。富良野往返各約1hr，建議待4-5hr，午餐在園內。一整天主題，孩子最開心的一天！",
         videos:[
           { title:"大人小孩都喜歡！旭山動物園完整攻略（中文）", url:"https://www.youtube.com/watch?v=ErH2Jzm5_SU" },
           { title:"旭山動物園夏日一日遊！超近距離看動物（中文）", url:"https://www.youtube.com/watch?v=rKNx9plIWTI" },
@@ -310,55 +368,20 @@ const DAYS_V1 = [
     ]
   },
   {
-    day:4, date:"7/5（日）", label:"富良野→札幌・莫埃來沼", color:"#9b59b6",
-    spotCount:"景點×1", hotelTag:"transfer", hotelLabel:"🚗 移動日 → 飯店② 札幌（連住2晚）",
-    spots:[
-      { id:"moerenuma", name:"莫埃來沼公園", icon:"⛲",
-        lat:43.1419, lng:141.4036,
-        desc:"富良野→札幌移動日(約2.5hr)。野口勇設計的大地藝術公園，玻璃金字塔・噴水秀・玩沙・莫埃來海灘，孩子盡情放電，免費入園",
-        videos:[
-          { title:"和孩子玩莫埃來沼・海灘・玻璃金字塔（全免費）（日文）", url:"https://www.youtube.com/watch?v=FhqhmYIlfUQ" },
-          { title:"親子北海道vlog・含莫埃來沼公園（日文）", url:"https://www.youtube.com/watch?v=hgUrciDweF4" }
-        ]
-      }
-    ]
-  },
-  {
-    day:5, date:"7/6（一）", label:"小樽一日遊", color:"#8e44ad",
-    spotCount:"景點×2", hotelTag:"h2", hotelLabel:"🏨 飯店② 札幌（連住）",
-    spots:[
-      { id:"otaru_aq", name:"小樽水族館", icon:"🐧",
-        lat:43.2236, lng:140.9870,
-        desc:"祝津海邊水族館，企鵝遊行・海獅海豚秀，著名的「不聽話企鵝秀」超爆笑，孩子能近距離互動。建議上午看表演場次",
-        videos:[
-          { title:"完全不聽話的企鵝秀太有趣了！おたる水族館（日文）", url:"https://www.youtube.com/watch?v=3gltsE39dmI" },
-          { title:"海獅跳水＋自由企鵝秀・半世紀小樽水族館（日文）", url:"https://www.youtube.com/watch?v=NctiI3cv3OY" }
-        ]
-      },
-      { id:"otaru_canal", name:"小樽運河＋堺町通", icon:"🏛️",
-        lat:43.1986, lng:140.9947,
-        desc:"運河與堺町通商店街步行串聯（約10分鐘車程）。北一硝子・音樂盒堂・海鮮丼・蒸氣鐘，懷舊街道好拍好逛",
-        pair:"🔗 運河與堺町通步行可達，視為同一區",
-        videos:[
-          { title:"小樽堺町通り街歩き・海鮮丼・北一硝子（中文）", url:"https://www.youtube.com/watch?v=5N2OXUlKc4g" },
-          { title:"北海道自由行・浪漫小樽運河商店街（中文）", url:"https://www.youtube.com/watch?v=D8oNoMRYcxw" }
-        ]
-      }
-    ]
-  },
-  {
-    day:6, date:"7/7（二）", label:"札幌→登別→洞爺湖", color:"#2980b9",
+    day:6, date:"7/7（二）", label:"富良野→登別→洞爺湖", color:"#2980b9",
     spotCount:"景點×2", hotelTag:"transfer", hotelLabel:"🚗 移動日 → 飯店③ 洞爺湖（連住2晚）",
     spots:[
-      { id:"bear_park", name:"登別熊牧場", icon:"🐻",
+      {
+        id:"bear_park", name:"登別熊牧場", icon:"🐻",
         lat:42.4897, lng:141.1497,
-        desc:"搭纜車上山看蝦夷棕熊，餵食體驗・小熊區・人猿之湖，山上展望湖景。札幌→登別約1.5hr",
+        desc:"搭纜車上山看蝦夷棕熊，餵食體驗・小熊區・人猿之湖，山上展望湖景。富良野→登別約2.5hr",
         videos:[
           { title:"北海道旅行・登別熊牧場與熊近距離接觸（中/日）", url:"https://www.youtube.com/watch?v=w1a8N8pL0YU" },
           { title:"今年出生小熊公開・元氣滿滿登別熊牧場（日文）", url:"https://www.youtube.com/watch?v=NX9lfpebzDo" }
         ]
       },
-      { id:"jigokudani", name:"登別地獄谷", icon:"🌋",
+      {
+        id:"jigokudani", name:"登別地獄谷", icon:"🌋",
         lat:42.4955, lng:141.1490,
         desc:"火山噴氣谷地，木道散策約30-45分鐘，硫磺煙裊裊超震撼，旁有大湯沼川天然足湯。→ 續開40min抵洞爺湖，晚上20:45湖上煙火🎆",
         pair:"🔗 與登別熊牧場相隔5-10分鐘，視為相鄰一組",
@@ -373,7 +396,8 @@ const DAYS_V1 = [
     day:7, date:"7/8（三）", label:"洞爺湖", color:"#16a085",
     spotCount:"景點×2", hotelTag:"h3", hotelLabel:"🏨 飯店③ 洞爺湖（連住）",
     spots:[
-      { id:"toya_cruise", name:"洞爺湖遊覽船", icon:"⛴️",
+      {
+        id:"toya_cruise", name:"洞爺湖遊覽船", icon:"⛴️",
         lat:42.5606, lng:140.8407,
         desc:"中島巡遊約30-50分鐘，湖風涼爽，孩子坐船很開心。湖畔有免費足湯。晚上20:45再看一次湖上煙火🎆",
         videos:[
@@ -381,7 +405,8 @@ const DAYS_V1 = [
           { title:"洞爺湖兩天一夜・足湯・溫泉旅館（中文）", url:"https://www.youtube.com/watch?v=603GNdq6Mc4" }
         ]
       },
-      { id:"showa", name:"昭和新山・有珠山纜車", icon:"🌋",
+      {
+        id:"showa", name:"昭和新山・有珠山纜車", icon:"🌋",
         lat:42.5430, lng:140.8588,
         desc:"搭纜車6分鐘空中散步，俯瞰洞爺湖與火山口，日本首座世界地質公園。山腳有昭和新山熊牧場可順遊",
         pair:"🔗 與洞爺湖溫泉相隔約10分鐘車程",
@@ -396,49 +421,104 @@ const DAYS_V1 = [
     day:8, date:"7/9（四）", label:"回程", color:"#7f8c8d",
     spotCount:"回程日", hotelTag:"h3", hotelLabel:"✈️ 洞爺湖退房 → 新千歲回國",
     spots:[
-      { id:"cts_out", name:"新千歲機場 回國", icon:"🛫",
+      {
+        id:"cts_out", name:"新千歲機場 回國", icon:"🛫",
         lat:42.7752, lng:141.6921,
-        desc:"IT235 12:05 起飛。需10:00報到 → 9:30還車 → 8:00離洞爺湖（洞爺→機場約1.25hr）。早上純移動，無觀光時間。若有空檔可在機場3F哆啦A夢樂園、拉麵道場",
-        warn:"⚠️ 班機早，7/9上午是移動日；支笏湖/Northern Horse Park 已因時間不足移除",
+        desc:"IT235 12:05 起飛。需10:00報到 → 9:30還車 → 8:00離洞爺湖（洞爺→機場約1.25hr）。早上純移動，機場3F哆啦A夢樂園・拉麵道場・甜點街好好掃貨",
+        warn:"⚠️ 班機早，7/9上午是移動日，洞爺湖必須7:30-8:00前出發",
         videos:[
-          { title:"新千歲機場攻略・哆啦A夢樂園・美食（參考）", url:"https://www.youtube.com/results?search_query=新千歲機場+攻略" }
+          { title:"新千歲機場攻略・哆啦A夢樂園・拉麵道場・甜點（中文）", url:"https://www.youtube.com/results?search_query=新千歲機場+哆啦A夢+拉麵道場+甜點+攻略" }
         ]
       }
     ]
   }
 ];
 
-// ══════════════════════════════════════════════
-//  V2 資料 — 冷門秘境版
-// ══════════════════════════════════════════════
+// ──────────────────────────────────────────────
+//  V2 — 冷門秘境版
+// ──────────────────────────────────────────────
 const DAYS_V2 = [
   {
-    day:1, date:"7/2（四）", label:"抵達→富良野", color:"#e74c3c",
-    spotCount:"景點×1", hotelTag:"h1", hotelLabel:"🏨 飯店① 富良野・新富良野王子（連住3晚）",
+    day:1, date:"7/2（四）", label:"抵達→札幌 自由散策", color:"#e74c3c",
+    spotCount:"自由日・無租車", hotelTag:"h1", hotelLabel:"🏨 飯店① 札幌（連住2晚）",
     spots:[
-      { id:"cts_in", name:"新千歲機場 抵達", icon:"🛬",
-        lat:42.7752, lng:141.6921,
-        desc:"IT234 11:05 落地。出關+提行李+取車約1.5hr → 約13:00上路，開往富良野約2hr，15:30抵達",
+      {
+        id:"sapporo_arrive", name:"新千歲→札幌 搭電車入住", icon:"🚃",
+        lat:43.0686, lng:141.3507,
+        desc:"IT234 11:05落地。通關+領行李約45分鐘 → 搭快速エアポート到札幌只要37分！不租車，輕鬆帶孩子入住。午餐在札幌站地下美食街，再去大通公園或狸小路隨興逛",
+        free:"🚶 今天不租車！電車＋計程車移動，孩子累了直接回飯店",
         videos:[
-          { title:"新千歲機場攻略・哆啦A夢・美食（中文）", url:"https://www.youtube.com/results?search_query=新千歲機場+攻略+親子+哆啦A夢" }
+          { title:"快速エアポート・新千歲→札幌 搭電車攻略（日文）", url:"https://www.youtube.com/results?search_query=新千歳空港+快速エアポート+札幌+アクセス" },
+          { title:"札幌駅周辺・親子おさんぽスポット（日文）", url:"https://www.youtube.com/results?search_query=札幌駅+周辺+子連れ+散歩+おすすめ" }
         ]
       },
-      { id:"ningle", name:"森林精靈露台（ニングルテラス）", icon:"🌲",
-        lat:43.3219, lng:142.3854,
-        desc:"新富良野王子飯店內的秘境森林手作商店街。12棟木屋工坊點燈後如童話仙境，職人木工・玻璃・皮革手作。幾乎沒有外國觀光客，飯店附天然溫泉，第一天輕鬆入門",
-        secret:"🔍 秘境度★★★ 日本本地家庭客為主，幾乎無外國遊客",
+      {
+        id:"odori_tanuki2", name:"大通公園・狸小路 散策", icon:"🌳",
+        lat:43.0612, lng:141.3539,
+        desc:"大通公園（孩子跑跑跳跳）→ 狸小路商店街（室內有頂，逛街吃飯不怕天氣）。不趕時間，感受城市氛圍，明天才正式租車出發！",
+        free:"🚶 步行圈，完全不需要車，節省明天開車的體力",
         videos:[
-          { title:"ニングルテラス 夜の散策・幻想的な森（日文）", url:"https://www.youtube.com/results?search_query=ニングルテラス+夜+散策+富良野" },
-          { title:"新富良野プリンスホテル・温泉＋ニングルテラス（日文）", url:"https://www.youtube.com/results?search_query=新富良野プリンスホテル+ニングルテラス+子連れ" }
+          { title:"狸小路商店街・サッポロ散歩 子連れ（日文）", url:"https://www.youtube.com/results?search_query=狸小路+商店街+札幌+子連れ+散策" },
+          { title:"札幌大通公園夏の楽しみ方（日文）", url:"https://www.youtube.com/results?search_query=大通公園+テレビ塔+札幌+夏+観光" }
         ]
       }
     ]
   },
   {
-    day:2, date:"7/3（五）", label:"十勝岳火山・チーズ工房", color:"#e67e22",
-    spotCount:"景點×2", hotelTag:"h1", hotelLabel:"🏨 飯店① 富良野（連住）",
+    day:2, date:"7/3（五）", label:"租車→余市・積丹ブルー", color:"#e67e22",
+    spotCount:"景點×2・今日租車", hotelTag:"h1", hotelLabel:"🏨 飯店① 札幌（連住）",
     spots:[
-      { id:"tokachidake", name:"十勝岳望岳台", icon:"🌋",
+      {
+        id:"nikka", name:"余市・ニッカウヰスキー蒸留所", icon:"🏯",
+        lat:43.1850, lng:140.7794,
+        desc:"今天早上在札幌取車出發！1934年創業、日本威士忌傳奇誕生地。蘇格蘭風格石造建築群極美，免費參觀廠區！大人可試飲余市單一麥芽，孩子有免費蘋果汁。整個余市町充滿昭和氣息，幾乎無外國觀光客。札幌→余市約50分",
+        secret:"🔍 秘境度★★★ 外國遊客少，免費入場，性價比極高",
+        videos:[
+          { title:"ニッカウヰスキー余市蒸留所・無料見学完全ガイド（日文）", url:"https://www.youtube.com/results?search_query=ニッカウヰスキー+余市+蒸留所+見学+無料" }
+        ]
+      },
+      {
+        id:"shimamui", name:"積丹・島武意海岸", icon:"🌊",
+        lat:43.2791, lng:140.5906,
+        desc:"「積丹藍（Shakotan Blue）」！穿過100m隧道豁然開朗，翡翠藍的透明海灣。全日本最美的海水之一，距離余市約30分鐘，外國遊客幾乎為零。晚上回札幌飯店",
+        secret:"🔍 秘境度★★★★★ 外國人極少知道，積丹藍完全不輸沖繩",
+        videos:[
+          { title:"積丹・島武意海岸 神秘碧藍秘境 4K（日文）", url:"https://www.youtube.com/results?search_query=積丹+島武意海岸+青い海+絶景" },
+          { title:"積丹半島ドライブ・積丹ブルーの海岸線（日文）", url:"https://www.youtube.com/results?search_query=積丹半島+ドライブ+積丹ブルー+海" }
+        ]
+      }
+    ]
+  },
+  {
+    day:3, date:"7/4（六）", label:"頭大仏→移動→富良野", color:"#f39c12",
+    spotCount:"移動日＋2景點", hotelTag:"transfer", hotelLabel:"🚗 移動日 → 飯店② 富良野（連住3晚）",
+    spots:[
+      {
+        id:"hill_buddha", name:"頭大仏（滝野霊園）", icon:"🙏",
+        lat:42.9660, lng:141.3835,
+        desc:"安藤忠雄設計的隱秘建築傑作！13.5m的巨大佛頭從薰衣草丘陵中探出（7月正值盛開），蓮花穹頂長廊引導入場，光與影的空間體驗震撼人心。就在札幌南側，往富良野的路上順道停，門票¥500，約40分鐘遊覽",
+        secret:"🔍 秘境度★★★★ 全球最被低估的安藤忠雄作品，外國人幾乎不知道",
+        videos:[
+          { title:"頭大仏殿・安藤忠雄の隠れた名作・薰衣草との共演（日文）", url:"https://www.youtube.com/results?search_query=頭大仏+滝野霊園+安藤忠雄+ラベンダー" },
+          { title:"北海道・滝野霊園 頭大仏 穴場スポット（日文）", url:"https://www.youtube.com/results?search_query=滝野霊園+頭大仏+穴場+観光" }
+        ]
+      },
+      {
+        id:"ningle2", name:"森林精靈露台（ニングルテラス）", icon:"🌲",
+        lat:43.3219, lng:142.3854,
+        desc:"頭大仏後繼續北上約2.5hr抵達富良野。傍晚入住新富良野王子飯店，飯店內的森林手作商店街點燈後如童話仙境。不用再開車出去，附天然溫泉",
+        videos:[
+          { title:"ニングルテラス 夜の散策・幻想的な森（日文）", url:"https://www.youtube.com/results?search_query=ニングルテラス+夜+散策+富良野" }
+        ]
+      }
+    ]
+  },
+  {
+    day:4, date:"7/5（日）", label:"十勝岳・チーズ工房", color:"#27ae60",
+    spotCount:"景點×2", hotelTag:"h2", hotelLabel:"🏨 飯店② 富良野（連住）",
+    spots:[
+      {
+        id:"tokachidake", name:"十勝岳望岳台", icon:"🌋",
         lat:43.3757, lng:142.6809,
         desc:"海拔930m的活火山展望台，荒涼的火山岩石地貌宛如置身月球表面！雄大的十勝岳連峰近在眼前，硫磺噴氣孔清晰可見。從富良野出發約40分鐘，停車場免費",
         secret:"🔍 秘境度★★★★ 外國觀光客極少，純粹的大雪山麓火山景觀",
@@ -447,7 +527,8 @@ const DAYS_V2 = [
           { title:"上富良野・十勝岳登山口 望岳台から見る絶景（日文）", url:"https://www.youtube.com/results?search_query=十勝岳+望岳台+上富良野+景色" }
         ]
       },
-      { id:"cheese_kobo", name:"富良野チーズ工房", icon:"🧀",
+      {
+        id:"cheese_kobo", name:"富良野チーズ工房", icon:"🧀",
         lat:43.3409, lng:142.4106,
         desc:"免費參觀的起司・奶油手作工坊，可付費預約自製奶油體驗（約20分鐘）！孩子最愛現做軟冰淇淋，農業感濃厚，來客幾乎全是日本本地家庭",
         secret:"🔍 秘境度★★★ 遊客少，比青池人潮少90%",
@@ -458,13 +539,14 @@ const DAYS_V2 = [
     ]
   },
   {
-    day:3, date:"7/4（六）", label:"層雲峡大峽谷秘境", color:"#f39c12",
-    spotCount:"景點×1+", hotelTag:"h1", hotelLabel:"🏨 飯店① 富良野（連住）",
+    day:5, date:"7/6（一）", label:"層雲峡大峽谷秘境", color:"#2ecc71",
+    spotCount:"景點×1+", hotelTag:"h2", hotelLabel:"🏨 飯店② 富良野（連住）",
     spots:[
-      { id:"sounkyo", name:"層雲峡・銀河＆流星の滝", icon:"🏞️",
+      {
+        id:"sounkyo", name:"層雲峡・銀河＆流星の滝", icon:"🏞️",
         lat:43.8085, lng:143.0481,
         desc:"大雪山國立公園最壯觀的峽谷！高達100m的柱狀熔岩壁夾道，「銀河瀑布」與「流星瀑布」雙瀑並立，從停車場步行10-15分鐘即達。幾乎無外國遊客，富良野往返約4.5hr（早出發）",
-        pair:"🔗 銀河瀑布・流星瀑布相距500m可一次逛完；餘力可加搭黑岳纜車看高山雲海",
+        pair:"🔗 銀河・流星瀑布相距500m可一次逛完；餘力可加搭黑岳纜車看高山雲海",
         secret:"🔍 秘境度★★★★★ 外國觀光客極少，大雪山真正的秘境",
         videos:[
           { title:"層雲峡・銀河の滝・流星の滝 北海道最強秘境（日文）", url:"https://www.youtube.com/results?search_query=層雲峡+銀河の滝+流星の滝+夏" },
@@ -474,58 +556,22 @@ const DAYS_V2 = [
     ]
   },
   {
-    day:4, date:"7/5（日）", label:"富良野→頭大仏→札幌", color:"#9b59b6",
-    spotCount:"景點×1", hotelTag:"transfer", hotelLabel:"🚗 移動日 → 飯店② 札幌（連住2晚）",
-    spots:[
-      { id:"hill_buddha", name:"頭大仏（滝野霊園）", icon:"🙏",
-        lat:42.9660, lng:141.3835,
-        desc:"安藤忠雄設計的隱秘建築傑作！13.5m的巨大佛頭從薰衣草丘陵中探出（7月正值盛開），蓮花穹頂長廊引導入場，光與影的空間體驗震撼人心。在富良野→札幌的路上，門票¥500",
-        secret:"🔍 秘境度★★★★ 全球最被低估的安藤忠雄作品，外國人幾乎不知道",
-        videos:[
-          { title:"頭大仏殿・安藤忠雄の隠れた名作・薰衣草との共演（日文）", url:"https://www.youtube.com/results?search_query=頭大仏+滝野霊園+安藤忠雄+ラベンダー" },
-          { title:"北海道・滝野霊園 頭大仏 穴場スポット（日文）", url:"https://www.youtube.com/results?search_query=滝野霊園+頭大仏+穴場+観光" }
-        ]
-      }
-    ]
-  },
-  {
-    day:5, date:"7/6（一）", label:"余市・積丹ブルー", color:"#8e44ad",
-    spotCount:"景點×2", hotelTag:"h2", hotelLabel:"🏨 飯店② 札幌（連住）",
-    spots:[
-      { id:"nikka", name:"余市・ニッカウヰスキー蒸留所", icon:"🏯",
-        lat:43.1850, lng:140.7794,
-        desc:"1934年創業、日本威士忌傳奇的誕生地。蘇格蘭風格石造建築群極美，免費參觀廠區！大人可試飲余市單一麥芽，孩子有免費蘋果汁。整個余市町充滿昭和氣息，幾乎無外國觀光客",
-        secret:"🔍 秘境度★★★ 外國遊客少，免費入場，性價比極高",
-        videos:[
-          { title:"ニッカウヰスキー余市蒸留所・無料見学完全ガイド（日文）", url:"https://www.youtube.com/results?search_query=ニッカウヰスキー+余市+蒸留所+見学+無料" }
-        ]
-      },
-      { id:"shimamui", name:"積丹・島武意海岸", icon:"🌊",
-        lat:43.2791, lng:140.5906,
-        desc:"「積丹藍（Shakotan Blue）」！穿過100m隧道豁然開朗，翡翠藍的透明海灣，海蝕洞・白沙灘。全日本最美的海水之一，距離余市約30分鐘，外國遊客幾乎為零",
-        secret:"🔍 秘境度★★★★★ 外國人極少知道，積丹藍完全不輸沖繩",
-        videos:[
-          { title:"積丹・島武意海岸 神秘碧藍秘境 4K（日文）", url:"https://www.youtube.com/results?search_query=積丹+島武意海岸+青い海+絶景" },
-          { title:"積丹半島ドライブ・積丹ブルーの海岸線（日文）", url:"https://www.youtube.com/results?search_query=積丹半島+ドライブ+積丹ブルー+海" }
-        ]
-      }
-    ]
-  },
-  {
     day:6, date:"7/7（二）", label:"地球岬・クッタラ湖→洞爺湖", color:"#2980b9",
     spotCount:"景點×2", hotelTag:"transfer", hotelLabel:"🚗 移動日 → 飯店③ 洞爺湖（連住2晚）",
     spots:[
-      { id:"earth_cape", name:"地球岬（室蘭）", icon:"🌍",
+      {
+        id:"earth_cape", name:"地球岬（室蘭）", icon:"🌍",
         lat:42.3110, lng:141.0040,
-        desc:"站在100m高斷崖眺望，因海平線弧度能實際感受地球曲率而得名。兩座白色燈塔矗立崖邊，無邊際的太平洋，幾乎無外國觀光客的室蘭秘景。札幌→室蘭約1.5hr",
-        secret:"🔍 秘境度★★★★ 室蘭是工業城市很少人去，但地球岬景色震撼",
+        desc:"站在100m高斷崖眺望，因海平線弧度能實際感受地球曲率而得名。兩座白色燈塔矗立崖邊，無邊際的太平洋，幾乎無外國觀光客的室蘭秘景。富良野→室蘭約2.5hr",
+        secret:"🔍 秘境度★★★★ 室蘭是工業城市少人去，但地球岬景色震撼",
         videos:[
           { title:"地球岬・室蘭の秘境岬 ほぼ無人の絶景（日文）", url:"https://www.youtube.com/results?search_query=地球岬+室蘭+灯台+絶景" }
         ]
       },
-      { id:"kuttara", name:"クッタラ湖（透明度日本一の火口湖）", icon:"💧",
+      {
+        id:"kuttara", name:"クッタラ湖（透明度日本一の火口湖）", icon:"💧",
         lat:42.5139, lng:141.2019,
-        desc:"透明度日本第一的完美圓形火口湖！幾乎無開發，只有展望台俯瞰，深邃的藍黑色湖面神秘壯觀，沒有遊覧船也沒有商店街。登別熊牧場旁僅3km，幾乎所有觀光客都不知道這個湖",
+        desc:"透明度日本第一的完美圓形火口湖！幾乎無開發，只有展望台俯瞰，深邃的藍黑色湖面神秘壯觀。登別熊牧場旁僅3km，幾乎所有觀光客都不知道這個湖。→ 續開40min抵洞爺湖，晚上20:45湖上煙火🎆",
         secret:"🔍 秘境度★★★★★ 透明度日本第一卻少人知，真正的秘境",
         videos:[
           { title:"クッタラ湖・透明度日本一の火口湖 秘境探訪（日文）", url:"https://www.youtube.com/results?search_query=クッタラ湖+透明度+日本一+秘境" }
@@ -537,17 +583,19 @@ const DAYS_V2 = [
     day:7, date:"7/8（三）", label:"有珠山噴火遺跡・洞爺湖煙火", color:"#16a085",
     spotCount:"景點×2", hotelTag:"h3", hotelLabel:"🏨 飯店③ 洞爺湖（連住）",
     spots:[
-      { id:"usu_crater", name:"有珠山西山火口散策路（免費）", icon:"🌋",
+      {
+        id:"usu_crater", name:"有珠山西山火口散策路（免費）", icon:"🌋",
         lat:42.5314, lng:140.8190,
-        desc:"2000年有珠山噴火災害遺跡！完全免費戶外散步道（約30-40分鐘），被溶岩吞沒的道路、地面隆起扭曲的住宅、埋入地下的車輛，宛如時間靜止的末日場景。比付費纜車更震撼，幾乎無外國觀光客",
+        desc:"2000年有珠山噴火災害遺跡！完全免費戶外散步道（約30-40分鐘），被溶岩吞沒的道路、地面隆起扭曲的住宅、埋入地下的車輛，宛如時間靜止的末日場景。比付費纜車更震撼",
         secret:"🔍 秘境度★★★★ 比有珠山纜車更震撼且免費，幾乎沒外國遊客知道",
         videos:[
           { title:"有珠山西山火口散策路・2000年噴火の生々しい痕跡（日文）", url:"https://www.youtube.com/results?search_query=有珠山+西山火口+散策路+2000年噴火+跡" }
         ]
       },
-      { id:"toya_fireworks", name:"洞爺湖遊覧船 ＋ 湖上煙火🎆", icon:"⛴️",
+      {
+        id:"toya_fireworks", name:"洞爺湖遊覧船 ＋ 湖上煙火🎆", icon:"⛴️",
         lat:42.5606, lng:140.8407,
-        desc:"中島巡遊約30-50分鐘，湖風涼爽，孩子坐船很開心。湖畔有免費足湯。晚上20:45湖上煙火🎆（4月-10月每晚舉辦！房間就能看到）",
+        desc:"中島巡遊約30-50分鐘，湖風涼爽，孩子坐船很開心。湖畔有免費足湯。晚上20:45湖上煙火（4月-10月每晚舉辦！房間就能看到）🎆",
         videos:[
           { title:"洞爺湖・毎晩開催の湖上花火と遊覧船（日文）", url:"https://www.youtube.com/results?search_query=洞爺湖+花火+毎晩+遊覧船+温泉" }
         ]
@@ -558,12 +606,13 @@ const DAYS_V2 = [
     day:8, date:"7/9（四）", label:"回程", color:"#7f8c8d",
     spotCount:"回程日", hotelTag:"h3", hotelLabel:"✈️ 洞爺湖退房 → 新千歲回國",
     spots:[
-      { id:"cts_out", name:"新千歲機場 回國", icon:"🛫",
+      {
+        id:"cts_out", name:"新千歲機場 回國", icon:"🛫",
         lat:42.7752, lng:141.6921,
         desc:"IT235 12:05 起飛。需10:00報到 → 9:30還車 → 8:00離洞爺湖（洞爺→機場約1.25hr）。早上純移動，機場3F哆啦A夢樂園・拉麵道場・甜點街好好掃貨",
-        warn:"⚠️ 班機早，7/9上午是移動日，洞爺湖必須早起7:30前出發",
+        warn:"⚠️ 班機早，7/9上午是移動日，洞爺湖必須7:30-8:00前出發",
         videos:[
-          { title:"新千歲機場・哆啦A夢樂園・拉麵道場・甜點攻略（中文）", url:"https://www.youtube.com/results?search_query=新千歲機場+哆啦A夢樂園+美食+攻略" }
+          { title:"新千歲機場攻略・哆啦A夢樂園・拉麵道場・甜點（中文）", url:"https://www.youtube.com/results?search_query=新千歲機場+哆啦A夢+拉麵道場+甜點+攻略" }
         ]
       }
     ]
@@ -573,7 +622,7 @@ const DAYS_V2 = [
 // ══════════════════════════════════════════════
 //  地圖初始化
 // ══════════════════════════════════════════════
-const map = L.map('map').setView([43.1, 141.6], 8);
+const map = L.map('map').setView([43.0, 141.5], 8);
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
   attribution: '© OpenStreetMap contributors', maxZoom: 18
 }).addTo(map);
@@ -583,13 +632,28 @@ let renderedDayLayers = {};
 let currentVersion = 'v1';
 
 // ──────────────────────────────────────────────
-//  切換版本
+//  版本主題
 // ──────────────────────────────────────────────
 const THEMES = {
-  v1: { bg: 'linear-gradient(135deg,#1a6b3c 0%,#2d9b5a 100%)', btnColor: '#1a6b3c', badge: '📍 每天≤2景點', center: [43.1, 141.6], zoom: 8 },
-  v2: { bg: 'linear-gradient(135deg,#1a4a8c 0%,#2d72d9 100%)', btnColor: '#1a4a8c', badge: '🔍 冷門秘境版', center: [43.0, 141.8], zoom: 7 }
+  v1: {
+    bg: 'linear-gradient(135deg,#1a6b3c 0%,#2d9b5a 100%)',
+    btnColor: '#1a6b3c',
+    badge: '📍 D2才租車',
+    center: [43.0, 141.4], zoom: 8,
+    hotelA: '① 札幌 D1-D2', hotelB: '② 富良野 D3-D5', hotelC: '③ 洞爺湖 D6-D7'
+  },
+  v2: {
+    bg: 'linear-gradient(135deg,#1a4a8c 0%,#2d72d9 100%)',
+    btnColor: '#1a4a8c',
+    badge: '🔍 冷門秘境版',
+    center: [43.0, 141.6], zoom: 7,
+    hotelA: '① 札幌 D1-D2', hotelB: '② 富良野 D3-D5', hotelC: '③ 洞爺湖 D6-D7'
+  }
 };
 
+// ──────────────────────────────────────────────
+//  切換版本
+// ──────────────────────────────────────────────
 function switchVersion(ver) {
   if (ver === currentVersion) return;
   currentVersion = ver;
@@ -612,21 +676,15 @@ function switchVersion(ver) {
 }
 
 // ──────────────────────────────────────────────
-//  清除 + 重新渲染
+//  清除 + 重建
 // ──────────────────────────────────────────────
 function renderVersion(days) {
-  // 清除地圖圖層
   Object.values(renderedDayLayers).forEach(l => map.removeLayer(l));
   renderedDayLayers = {};
   polylineGroup.clearLayers();
-
-  // 清除地圖覆蓋層
   document.querySelectorAll('.map-legend, .hotel-strip').forEach(el => el.remove());
-
-  // 清除 sidebar
   document.getElementById('dayList').innerHTML = '';
 
-  // 清除 filter 按鈕（保留「全部」）
   const filterBar = document.getElementById('filterBar');
   while (filterBar.children.length > 1) filterBar.removeChild(filterBar.lastChild);
   filterBar.children[0].classList.add('active');
@@ -635,7 +693,7 @@ function renderVersion(days) {
 }
 
 // ──────────────────────────────────────────────
-//  建立所有天的地圖 + sidebar
+//  建立天數（地圖 + sidebar）
 // ──────────────────────────────────────────────
 function buildDays(days) {
   const filterBar = document.getElementById('filterBar');
@@ -653,7 +711,7 @@ function buildDays(days) {
     btn.style.cssText = `background:${d.color};color:#fff;`;
     filterBar.appendChild(btn);
 
-    // Day block
+    // Day block HTML
     const block = document.createElement('div');
     block.className = 'day-block';
     block.id = `day-block-${d.day}`;
@@ -668,39 +726,40 @@ function buildDays(days) {
         <span class="spot-count" style="background:${d.color}">${d.spotCount}</span>
         <span class="day-chevron">▶</span>
       </div>
-      <div class="day-spots" id="spots-${d.day}"></div>
-    `;
+      <div class="day-spots" id="spots-${d.day}"></div>`;
     dayListEl.appendChild(block);
     const spotsEl = document.getElementById(`spots-${d.day}`);
 
     d.spots.forEach(s => {
       coords.push([s.lat, s.lng]);
 
-      // 地圖 marker
+      // Marker
       const marker = L.marker([s.lat, s.lng], { icon: makeIcon(d.color, s.icon) });
       const ytPopup     = s.videos.map(v => `<a href="${v.url}" target="_blank">${ytSvg()} ${v.title}</a>`).join('');
       const warnPopup   = s.warn   ? `<div class="popup-warn">${s.warn}</div>`     : '';
       const pairPopup   = s.pair   ? `<div class="popup-pair">${s.pair}</div>`     : '';
       const secretPopup = s.secret ? `<div class="popup-secret">${s.secret}</div>` : '';
+      const freePopup   = s.free   ? `<div class="popup-free">${s.free}</div>`     : '';
       marker.bindPopup(`
         <div class="lf-popup" style="min-width:220px;max-width:280px">
           <div class="popup-title">${s.icon} ${s.name}</div>
           <div class="popup-day" style="background:${d.color}">D${d.day} ${d.date}</div>
           <div class="popup-desc">${s.desc}</div>
-          ${secretPopup}${pairPopup}${warnPopup}
+          ${freePopup}${secretPopup}${pairPopup}${warnPopup}
           <div class="popup-yt">${ytPopup}</div>
         </div>`, { maxWidth: 300 });
       marker.addTo(layer);
 
-      // Sidebar 卡片
+      // Sidebar card
       const card = document.createElement('div');
       card.className = 'spot-card';
       card.style.borderLeftColor = d.color;
       const warnCard   = s.warn   ? `<span class="warn">${s.warn}</span>`     : '';
       const pairCard   = s.pair   ? `<span class="pair">${s.pair}</span>`     : '';
       const secretCard = s.secret ? `<span class="secret">${s.secret}</span>` : '';
+      const freeCard   = s.free   ? `<span class="free">${s.free}</span>`     : '';
       const ytLinks    = s.videos.map(v => `<a class="yt-link" href="${v.url}" target="_blank">${ytSvg()} ${v.title}</a>`).join('');
-      card.innerHTML = `<h4>${s.icon} ${s.name}</h4><p>${s.desc}</p>${secretCard}${pairCard}${warnCard}<div class="yt-links">${ytLinks}</div>`;
+      card.innerHTML = `<h4>${s.icon} ${s.name}</h4><p>${s.desc}</p>${freeCard}${secretCard}${pairCard}${warnCard}<div class="yt-links">${ytLinks}</div>`;
       card.addEventListener('click', e => {
         if (e.target.tagName === 'A' || e.target.closest('a')) return;
         document.getElementById(`day-block-${d.day}`).classList.add('open');
@@ -710,26 +769,28 @@ function buildDays(days) {
       spotsEl.appendChild(card);
     });
 
+    // 同天連線
     if (coords.length > 1) {
       L.polyline(coords, { color: d.color, weight: 3, opacity: 0.75, dashArray: '8,5' }).addTo(polylineGroup);
     }
   });
 
-  // 跨天連線（灰色虛線）
+  // 跨天灰色虛線
   for (let i = 0; i < days.length - 1; i++) {
     const from = days[i].spots[days[i].spots.length - 1];
     const to   = days[i+1].spots[0];
     L.polyline([[from.lat, from.lng],[to.lat, to.lng]], { color: '#bbb', weight: 2, opacity: 0.55, dashArray: '4,8' }).addTo(polylineGroup);
   }
 
-  // 圖例
+  // 地圖圖例
+  const t = THEMES[currentVersion];
   const leg = document.createElement('div');
   leg.className = 'map-legend';
   leg.innerHTML = `<div class="legend-title">📅 ${currentVersion === 'v1' ? 'V1 熱門版' : 'V2 秘境版'}</div>` +
     days.map(d => `<div class="legend-item"><div class="legend-dot" style="background:${d.color}"></div><span>D${d.day} ${d.label}</span></div>`).join('') +
     `<div class="legend-sep">── 住宿（換2次）</div>
-     <div class="legend-item"><div class="legend-dot" style="background:#e74c3c"></div><span>① 富良野 (D1-D3)</span></div>
-     <div class="legend-item"><div class="legend-dot" style="background:#8e44ad"></div><span>② 札幌 (D4-D5)</span></div>
+     <div class="legend-item"><div class="legend-dot" style="background:#e74c3c"></div><span>① 札幌 (D1-D2)</span></div>
+     <div class="legend-item"><div class="legend-dot" style="background:#e67e22"></div><span>② 富良野 (D3-D5)</span></div>
      <div class="legend-item"><div class="legend-dot" style="background:#16a085"></div><span>③ 洞爺湖 (D6-D7)</span></div>`;
   document.getElementById('map').appendChild(leg);
 
@@ -737,12 +798,12 @@ function buildDays(days) {
   const strip = document.createElement('div');
   strip.className = 'hotel-strip';
   strip.innerHTML = `
-    <div class="hotel-chip h1">🏨① 富良野 D1-D3</div>
-    <div class="hotel-chip h2">🏨② 札幌 D4-D5</div>
+    <div class="hotel-chip h1">🏨① 札幌 D1-D2</div>
+    <div class="hotel-chip h2">🏨② 富良野 D3-D5</div>
     <div class="hotel-chip h3">🏨③ 洞爺湖 D6-D7</div>`;
   document.getElementById('map').appendChild(strip);
 
-  // 預設展開第一天
+  // 預設展開 D1
   document.getElementById('day-block-1').classList.add('open');
 }
 
@@ -764,7 +825,7 @@ function toggleDay(day) {
 }
 
 // ──────────────────────────────────────────────
-//  Filter 事件
+//  Filter 篩選
 // ──────────────────────────────────────────────
 document.getElementById('filterBar').addEventListener('click', e => {
   const btn = e.target.closest('button');
@@ -794,7 +855,7 @@ document.getElementById('filterBar').addEventListener('click', e => {
 });
 
 // ──────────────────────────────────────────────
-//  初始化（載入 V1）
+//  初始化（V1）
 // ──────────────────────────────────────────────
 document.getElementById('btnV1').style.color = THEMES.v1.btnColor;
 renderVersion(DAYS_V1);
