@@ -26,7 +26,7 @@
     .filter-bar button.active{opacity:1;transform:scale(1.08);box-shadow:0 2px 6px rgba(0,0,0,.25)}
     .hotel-change{display:flex;align-items:center;gap:8px;padding:6px 12px;font-size:11px;font-weight:600;border-bottom:1px solid #eee}
     .hotel-change.h1{background:#fdecea;color:#c0392b}
-    .hotel-change.h2{background:#fef3e2;color:#b45309}
+    .hotel-change.h2{background:#e8f4fd;color:#1a6b9a}
     .hotel-change.h3{background:#e0f2f1;color:#00695c}
     .hotel-change.transfer{background:#f3e9f7;color:#6c3483}
     .day-block{border-bottom:1px solid #eee}
@@ -73,11 +73,9 @@
     .hotel-strip{position:absolute;top:10px;left:50%;transform:translateX(-50%);z-index:1000;display:flex;gap:6px;flex-wrap:wrap;justify-content:center;max-width:90%}
     .hotel-chip{background:white;border-radius:20px;padding:4px 12px;font-size:11px;font-weight:600;box-shadow:0 2px 8px rgba(0,0,0,.2);white-space:nowrap}
     .hotel-chip.h1{border-left:4px solid #e74c3c;color:#c0392b}
-    .hotel-chip.h2{border-left:4px solid #e67e22;color:#b45309}
+    .hotel-chip.h2{border-left:4px solid #2980b9;color:#1a6b9a}
     .hotel-chip.h3{border-left:4px solid #16a085;color:#00695c}
-    /* Route loading indicator */
     #routeLoader{position:absolute;bottom:70px;left:50%;transform:translateX(-50%);z-index:1001;background:rgba(0,0,0,.65);color:white;border-radius:20px;padding:5px 14px;font-size:11px;display:none;pointer-events:none;white-space:nowrap}
-    /* Route legend */
     .route-legend-row{display:flex;align-items:center;gap:8px;margin-bottom:3px;font-size:10px;color:#555}
     .route-swatch{width:24px;height:4px;border-radius:2px;flex-shrink:0}
     @media(max-width:767px){
@@ -137,10 +135,11 @@
 </div>
 <script>
 // ═══════════════════════════════════════════
-//  飯店結構（V1/V2 共用）
-//  ① 富良野 D1-D3（3晚）  CTS取車直接北上
-//  ② 洞爺湖 D4-D5（2晚）  長途移動日
-//  ③ 札幌   D6-D7（2晚）  D8開車回CTS（国道36免費）
+//  飯店結構（V1/V2 共用）逆時針環狀閉環
+//  ① 富良野 D1-D3（3晚）  CTS取車直接東北上
+//  ② 小樽   D4-D5（2晚）  富良野→旭川→道央道→小樽 西向
+//  ③ 洞爺湖 D6-D7（2晚）  小樽→道央道→洞爺湖 西南向
+//  D8 洞爺湖→登別→国道36→CTS 回程
 // ═══════════════════════════════════════════
 
 const DAYS_V1 = [
@@ -188,70 +187,77 @@ const DAYS_V1 = [
           {title:"大人小孩都喜歡！旭山動物園完整攻略（中文）",url:"https://www.youtube.com/watch?v=ErH2Jzm5_SU"},
           {title:"旭山動物園夏日一日遊！超近距離看動物（中文）",url:"https://www.youtube.com/watch?v=rKNx9plIWTI"},
           {title:"親子景點旭山動物園・極地動物面對面（中文）",url:"https://www.youtube.com/watch?v=m4wS-UgcS-g"}]}]},
-  { day:4, date:"7/5（日）", label:"富良野→登別→洞爺湖", color:"#8e44ad",
-    spotCount:"景點×2", hotelTag:"transfer", hotelLabel:"🚗 移動日 → 飯店② 洞爺湖（連住2晚）",
+  { day:4, date:"7/5（日）", label:"富良野→小樽（水族館・運河）", color:"#8e44ad",
+    spotCount:"景點×2", hotelTag:"transfer", hotelLabel:"🚗 移動日 → 飯店② 小樽（連住2晚）",
     spots:[
-      { id:"bear_park", name:"登別熊牧場", icon:"🐻",
-        lat:42.4897, lng:141.1497,
-        desc:"搭纜車上山看蝦夷棕熊，餵食體驗・小熊區・人猿之湖，山上展望湖景。富良野→登別走道央道約2.5hr（HEP全程覆蓋）",
+      { id:"otaru_aq", name:"小樽水族館", icon:"🐧",
+        lat:43.2236, lng:140.9870,
+        desc:"富良野→旭川→道央道→小樽約2.5hr（HEP全程覆蓋）。祝津海邊水族館，企鵝遊行・海獅海豚秀，著名的「不聽話企鵝秀」超爆笑！下午抵達趕場次",
         videos:[
-          {title:"北海道旅行・登別熊牧場與熊近距離接觸（中/日）",url:"https://www.youtube.com/watch?v=w1a8N8pL0YU"},
-          {title:"今年出生小熊公開・元氣滿滿登別熊牧場（日文）",url:"https://www.youtube.com/watch?v=NX9lfpebzDo"}]},
-      { id:"jigokudani", name:"登別地獄谷", icon:"🌋",
-        lat:42.4955, lng:141.1490,
-        desc:"火山噴氣谷地，木道散策約30-45分鐘，硫磺煙裊裊超震撼，旁有大湯沼川天然足湯。→ 續開40min抵洞爺湖，晚上20:45湖上煙火🎆",
-        pair:"🔗 與登別熊牧場相隔5-10分鐘，視為相鄰一組",
+          {title:"完全不聽話的企鵝秀太有趣了！おたる水族館（日文）",url:"https://www.youtube.com/watch?v=3gltsE39dmI"},
+          {title:"海獅跳水＋自由企鵝秀・半世紀小樽水族館（日文）",url:"https://www.youtube.com/watch?v=NctiI3cv3OY"}]},
+      { id:"otaru_canal", name:"小樽運河＋堺町通", icon:"🏛️",
+        lat:43.1986, lng:140.9947,
+        desc:"水族館散場後沿運河散步，煤氣燈夜晚超浪漫。北一硝子・音樂盒堂・海鮮丼，懷舊石造倉庫街道好拍好逛",
+        pair:"🔗 水族館→運河車程僅10分，下午水族館・傍晚運河完美銜接",
         videos:[
-          {title:"登別自由行一日遊・地獄谷・大湯沼・極樂通（中文）",url:"https://www.youtube.com/watch?v=7eDHFIRO8R4"},
-          {title:"登別最強行程・地獄谷+熊牧場+愛努文化（中文）",url:"https://www.youtube.com/watch?v=ljC6nFfHrvU"}]}]},
-  { day:5, date:"7/6（一）", label:"洞爺湖", color:"#2980b9",
-    spotCount:"景點×2", hotelTag:"h2", hotelLabel:"🏨 飯店② 洞爺湖（連住）",
+          {title:"小樽堺町通り・海鮮丼・北一硝子（中文）",url:"https://www.youtube.com/watch?v=5N2OXUlKc4g"},
+          {title:"北海道自由行・浪漫小樽運河商店街（中文）",url:"https://www.youtube.com/watch?v=D8oNoMRYcxw"}]}]},
+  { day:5, date:"7/6（一）", label:"モエレ沼・円山動物園", color:"#2980b9",
+    spotCount:"景點×2", hotelTag:"h2", hotelLabel:"🏨 飯店② 小樽（連住）",
     spots:[
-      { id:"toya_cruise", name:"洞爺湖遊覽船", icon:"⛴️",
+      { id:"moerenuma", name:"モエレ沼公園", icon:"⛲",
+        lat:43.1419, lng:141.4036,
+        desc:"野口勇設計的大地藝術公園！玻璃金字塔・噴水秀・モエレ海灘・玩沙廣場，孩子盡情放電。小樽→モエレ沼約40min（道央道），免費入園",
+        videos:[
+          {title:"和孩子玩モエレ沼・海灘・玻璃金字塔（全免費）（日文）",url:"https://www.youtube.com/watch?v=FhqhmYIlfUQ"},
+          {title:"親子北海道vlog・含モエレ沼公園（日文）",url:"https://www.youtube.com/watch?v=hgUrciDweF4"}]},
+      { id:"maruyama_zoo", name:"円山動物園（札幌）", icon:"🦁",
+        lat:43.0551, lng:141.3192,
+        desc:"北海道市立動物園！北極熊・雪豹・紅毛猩猩・爬蟲館，設施新穎，推車友善。モエレ沼→円山約20min，門票大人¥800・小學以下免費",
+        pair:"🔗 モエレ沼→円山動物園約20分，可串成一天行程",
+        videos:[
+          {title:"円山動物園 2024・北極熊・新施設完全ガイド（日文）",url:"https://www.youtube.com/results?search_query=円山動物園+北極熊+子連れ+札幌"},
+          {title:"札幌円山動物園 親子一日遊（日文）",url:"https://www.youtube.com/results?search_query=札幌+円山動物園+親子+一日"}]}]},
+  { day:6, date:"7/7（二）", label:"小樽→洞爺湖（遊覧船・煙火）", color:"#16a085",
+    spotCount:"景點×2", hotelTag:"transfer", hotelLabel:"🚗 移動日 → 飯店③ 洞爺湖（連住2晚）",
+    spots:[
+      { id:"toya_cruise", name:"洞爺湖遊覧船", icon:"⛴️",
         lat:42.5606, lng:140.8407,
-        desc:"中島巡遊約30-50分鐘，湖風涼爽，孩子坐船很開心。湖畔有免費足湯。晚上20:45湖上煙火🎆",
+        desc:"小樽→洞爺湖走道央道約1.5hr（HEP全程覆蓋）。中島巡遊約30-50分鐘，湖風涼爽，孩子坐船很開心。湖畔免費足湯。晚上20:45湖上煙火🎆",
         videos:[
           {title:"北海道必去洞爺湖・遊活火山・每天湖上煙火（中文）",url:"https://www.youtube.com/watch?v=4Gmr78N9NuI"},
           {title:"洞爺湖兩天一夜・足湯・溫泉旅館（中文）",url:"https://www.youtube.com/watch?v=603GNdq6Mc4"}]},
       { id:"showa", name:"昭和新山・有珠山纜車", icon:"🌋",
         lat:42.5430, lng:140.8588,
         desc:"搭纜車6分鐘空中散步，俯瞰洞爺湖與火山口，日本首座世界地質公園。山腳有昭和新山熊牧場可順遊",
-        pair:"🔗 與洞爺湖溫泉相隔約10分鐘車程",
+        pair:"🔗 與洞爺湖溫泉街相隔約10分鐘，可排同一天",
         videos:[
           {title:"有珠山纜車・昭和新山・洞爺湖絕景（日文）",url:"https://www.youtube.com/watch?v=_YR2igVP7r0"},
           {title:"有珠山纜車～昭和新山觀光（日文）",url:"https://www.youtube.com/watch?v=FbkIStB8YTg"}]}]},
-  { day:6, date:"7/7（二）", label:"洞爺湖→モエレ沼→札幌", color:"#16a085",
-    spotCount:"移動＋1景點", hotelTag:"transfer", hotelLabel:"🚗 移動日 → 飯店③ 札幌（連住2晚）",
+  { day:7, date:"7/8（三）", label:"登別熊牧場・地獄谷", color:"#27ae60",
+    spotCount:"景點×2", hotelTag:"h3", hotelLabel:"🏨 飯店③ 洞爺湖（連住）",
     spots:[
-      { id:"moerenuma", name:"モエレ沼公園", icon:"⛲",
-        lat:43.1419, lng:141.4036,
-        desc:"洞爺湖→札幌走道央道約1.5hr，途中在モエレ沼順道停。野口勇設計的大地藝術公園，玻璃金字塔・噴水秀・玩沙・モエレ海灘，孩子盡情放電，免費入園",
+      { id:"bear_park", name:"登別熊牧場", icon:"🐻",
+        lat:42.4897, lng:141.1497,
+        desc:"搭纜車上山看蝦夷棕熊，餵食體驗・小熊區・人猿之湖，山上展望湖景。洞爺湖→登別約40min（道央道）",
         videos:[
-          {title:"和孩子玩モエレ沼・海灘・玻璃金字塔（全免費）（日文）",url:"https://www.youtube.com/watch?v=FhqhmYIlfUQ"},
-          {title:"親子北海道vlog・含モエレ沼公園（日文）",url:"https://www.youtube.com/watch?v=hgUrciDweF4"}]}]},
-  { day:7, date:"7/8（三）", label:"小樽一日遊", color:"#27ae60",
-    spotCount:"景點×2", hotelTag:"h3", hotelLabel:"🏨 飯店③ 札幌（連住）",
-    spots:[
-      { id:"otaru_aq", name:"小樽水族館", icon:"🐧",
-        lat:43.2236, lng:140.9870,
-        desc:"祝津海邊水族館，企鵝遊行・海獅海豚秀，著名的「不聽話企鵝秀」超爆笑，孩子能近距離互動。建議上午看表演場次。札幌→小樽約40分",
+          {title:"北海道旅行・登別熊牧場與熊近距離接觸（中/日）",url:"https://www.youtube.com/watch?v=w1a8N8pL0YU"},
+          {title:"今年出生小熊公開・元氣滿滿登別熊牧場（日文）",url:"https://www.youtube.com/watch?v=NX9lfpebzDo"}]},
+      { id:"jigokudani", name:"登別地獄谷", icon:"🌋",
+        lat:42.4955, lng:141.1490,
+        desc:"火山噴氣谷地，木道散策約30-45分鐘，硫磺煙裊裊超震撼，旁有大湯沼川天然足湯。明天走国道36回CTS，沿途再逛一次溫泉街",
+        pair:"🔗 與登別熊牧場相隔5-10分鐘，視為相鄰一組",
         videos:[
-          {title:"完全不聽話的企鵝秀太有趣了！おたる水族館（日文）",url:"https://www.youtube.com/watch?v=3gltsE39dmI"},
-          {title:"海獅跳水＋自由企鵝秀・半世紀小樽水族館（日文）",url:"https://www.youtube.com/watch?v=NctiI3cv3OY"}]},
-      { id:"otaru_canal", name:"小樽運河＋堺町通", icon:"🏛️",
-        lat:43.1986, lng:140.9947,
-        desc:"運河與堺町通商店街步行串聯。北一硝子・音樂盒堂・海鮮丼・蒸氣鐘，懷舊街道好拍好逛",
-        pair:"🔗 運河與堺町通步行可達，視為同一區",
-        videos:[
-          {title:"小樽堺町通り・海鮮丼・北一硝子（中文）",url:"https://www.youtube.com/watch?v=5N2OXUlKc4g"},
-          {title:"北海道自由行・浪漫小樽運河商店街（中文）",url:"https://www.youtube.com/watch?v=D8oNoMRYcxw"}]}]},
+          {title:"登別自由行一日遊・地獄谷・大湯沼・極樂通（中文）",url:"https://www.youtube.com/watch?v=7eDHFIRO8R4"},
+          {title:"登別最強行程・地獄谷+熊牧場+愛努文化（中文）",url:"https://www.youtube.com/watch?v=ljC6nFfHrvU"}]}]},
   { day:8, date:"7/9（四）", label:"回程", color:"#7f8c8d",
-    spotCount:"回程日", hotelTag:"h3", hotelLabel:"✈️ 札幌退房 → 国道36 → 新千歲回國",
+    spotCount:"回程日", hotelTag:"h3", hotelLabel:"✈️ 洞爺湖退房 → 登別 → 国道36 → 新千歲回國",
     spots:[
       { id:"cts_out", name:"新千歲機場 還車・回國", icon:"🛫",
         lat:42.7752, lng:141.6921,
-        desc:"IT235 12:05起飛。D8走免費 国道36（約55分），省下高速費¥1,430。札幌8:00出發→CTS 8:55→還車→Check-in by 10:00 ✓。機場3F哆啦A夢樂園・拉麵道場掃貨",
-        warn:"⚠️ 走国道36（免費）而非高速，節省¥1,430，出發提早30分即可",
+        desc:"IT235 12:05起飛。洞爺湖→登別→苫小牧→国道36→CTS，走免費国道全程約1.5hr，省高速費¥2,000+。洞爺湖8:30出發→CTS 10:00→還車→Check-in by 10:30 ✓。機場3F哆啦A夢樂園・拉麵道場掃貨",
+        warn:"⚠️ 走登別→苫小牧→国道36（免費），約1.5hr，省高速費¥2,000+",
         videos:[{title:"新千歲機場攻略・哆啦A夢樂園・拉麵道場・甜點（中文）",url:"https://www.youtube.com/results?search_query=新千歲機場+哆啦A夢+拉麵道場+甜點+攻略"}]}]}
 ];
 
@@ -296,23 +302,54 @@ const DAYS_V2 = [
         videos:[
           {title:"層雲峡・銀河の滝・流星の滝 北海道最強秘境（日文）",url:"https://www.youtube.com/results?search_query=層雲峡+銀河の滝+流星の滝+夏"},
           {title:"黒岳ロープウェイ・高山植物と雲海・大雪山（日文）",url:"https://www.youtube.com/results?search_query=黒岳ロープウェイ+夏+雲海+大雪山"}]}]},
-  { day:4, date:"7/5（日）", label:"富良野→ウポポイ→洞爺湖", color:"#8e44ad",
-    spotCount:"景點×1", hotelTag:"transfer", hotelLabel:"🚗 移動日 → 飯店② 洞爺湖（連住2晚）",
+  { day:4, date:"7/5（日）", label:"富良野→余市・積丹ブルー→小樽", color:"#8e44ad",
+    spotCount:"景點×2", hotelTag:"transfer", hotelLabel:"🚗 移動日 → 飯店② 小樽（連住2晚）",
+    spots:[
+      { id:"nikka", name:"余市・ニッカウヰスキー蒸留所", icon:"🏯",
+        lat:43.1850, lng:140.7794,
+        desc:"1934年創業、日本威士忌傳奇誕生地。蘇格蘭風格石造建築群極美，完全免費參觀！大人試飲余市單一麥芽，孩子免費蘋果汁。富良野→余市走道央道約2hr",
+        secret:"🔍 秘境度★★★ 外國遊客少，免費入場，性價比極高",
+        videos:[{title:"ニッカウヰスキー余市蒸留所・無料見学完全ガイド（日文）",url:"https://www.youtube.com/results?search_query=ニッカウヰスキー+余市+蒸留所+見学+無料"}]},
+      { id:"shimamui", name:"積丹・島武意海岸", icon:"🌊",
+        lat:43.2791, lng:140.5906,
+        desc:"「積丹藍（Shakotan Blue）」！穿過100m隧道豁然開朗，翡翠藍透明海灣。全日本最美海水之一，距余市約30分鐘。→ 積丹→小樽約1hr，入住",
+        secret:"🔍 秘境度★★★★★ 外國人極少知道，積丹藍完全不輸沖繩",
+        videos:[
+          {title:"積丹・島武意海岸 神秘碧藍秘境 4K（日文）",url:"https://www.youtube.com/results?search_query=積丹+島武意海岸+青い海+絶景"},
+          {title:"積丹半島ドライブ・積丹ブルーの海岸線（日文）",url:"https://www.youtube.com/results?search_query=積丹半島+ドライブ+積丹ブルー+海"}]}]},
+  { day:5, date:"7/6（一）", label:"頭大仏・小樽運河", color:"#2980b9",
+    spotCount:"景點×2", hotelTag:"h2", hotelLabel:"🏨 飯店② 小樽（連住）",
+    spots:[
+      { id:"hill_buddha", name:"頭大仏（滝野霊園・安藤忠雄）", icon:"🙏",
+        lat:42.9660, lng:141.3835,
+        desc:"安藤忠雄設計的隱秘建築傑作！13.5m巨大佛頭從薰衣草丘陵中探出（7月正值盛開），蓮花穹頂長廊引導入場，光與影的空間體驗震撼人心。小樽→頭大仏約1hr，門票¥500",
+        secret:"🔍 秘境度★★★★ 全球最被低估的安藤忠雄作品，外國人幾乎不知道",
+        videos:[
+          {title:"頭大仏殿・安藤忠雄の隠れた名作・薰衣草との共演（日文）",url:"https://www.youtube.com/results?search_query=頭大仏+滝野霊園+安藤忠雄+ラベンダー"},
+          {title:"北海道・滝野霊園 頭大仏 穴場スポット（日文）",url:"https://www.youtube.com/results?search_query=滝野霊園+頭大仏+穴場+観光"}]},
+      { id:"otaru_canal", name:"小樽運河＋堺町通", icon:"🏛️",
+        lat:43.1986, lng:140.9947,
+        desc:"傍晚回小樽，煤氣燈點亮的運河散步。北一硝子・音樂盒堂・海鮮丼，懷舊石造倉庫街道好逛好拍",
+        videos:[
+          {title:"小樽堺町通り・海鮮丼・北一硝子（中文）",url:"https://www.youtube.com/watch?v=5N2OXUlKc4g"},
+          {title:"北海道自由行・浪漫小樽運河商店街（中文）",url:"https://www.youtube.com/watch?v=D8oNoMRYcxw"}]}]},
+  { day:6, date:"7/7（二）", label:"小樽→ウポポイ→洞爺湖", color:"#16a085",
+    spotCount:"景點×1", hotelTag:"transfer", hotelLabel:"🚗 移動日 → 飯店③ 洞爺湖（連住2晚）",
     spots:[
       { id:"upopoy", name:"ウポポイ（民族共生象徴空間・白老）", icon:"🪗",
         lat:42.5460, lng:141.3749,
-        desc:"2020年開館の国立アイヌ民族博物館！コタン（集落）の再現・伝統楽器体験・カヌー体験。外国人觀光客幾乎為零。富良野→白老走道東道約2.5hr，再到洞爺湖40min（道央道，HEP全程覆蓋）",
-        secret:"🔍 秘境度★★★★ 外国人がほぼ知らないアイヌ文化の最高峰施設，正牌官方國立",
+        desc:"2020年開館的國立阿伊努民族博物館！コタン集落再現・傳統樂器體驗・獨木舟體驗。外國觀光客幾乎為零。小樽→白老走道央道約1.5hr，再到洞爺湖40min（HEP全程），晚上煙火🎆",
+        secret:"🔍 秘境度★★★★ 外國人幾乎不知道的官方國立阿伊努文化最高峰",
         videos:[
           {title:"ウポポイ 民族共生象徴空間・アイヌ文化完全ガイド（日文）",url:"https://www.youtube.com/results?search_query=ウポポイ+民族共生象徴空間+アイヌ+白老"},
           {title:"子どもとウポポイ・体験型アイヌ文化（日文）",url:"https://www.youtube.com/results?search_query=ウポポイ+子連れ+体験+白老"}]}]},
-  { day:5, date:"7/6（一）", label:"地球岬・クッタラ湖・有珠山", color:"#2980b9",
-    spotCount:"景點×3", hotelTag:"h2", hotelLabel:"🏨 飯店② 洞爺湖（連住）",
+  { day:7, date:"7/8（三）", label:"地球岬・クッタラ湖・有珠山火口", color:"#27ae60",
+    spotCount:"景點×3", hotelTag:"h3", hotelLabel:"🏨 飯店③ 洞爺湖（連住）",
     spots:[
       { id:"earth_cape", name:"地球岬（室蘭）", icon:"🌍",
         lat:42.3110, lng:141.0040,
-        desc:"站在100m高斷崖眺望，因海平線弧度能實際感受地球曲率而得名。兩座白色燈塔矗立崖邊，無邊際的太平洋。洞爺湖→室蘭約50min（走道央道）",
-        secret:"🔍 秘境度★★★★ 室蘭是工業城市少人去，但地球岬景色震撼",
+        desc:"站在100m高斷崖，因海平線弧度能實際感受地球曲率而得名。兩座白色燈塔矗立崖邊，無邊際的太平洋。洞爺湖→室蘭約50min（道央道）",
+        secret:"🔍 秘境度★★★★ 室蘭工業城市少人去，但地球岬景色震撼",
         videos:[{title:"地球岬・室蘭の秘境岬 ほぼ無人の絶景（日文）",url:"https://www.youtube.com/results?search_query=地球岬+室蘭+灯台+絶景"}]},
       { id:"kuttara", name:"クッタラ湖（透明度日本一の火口湖）", icon:"💧",
         lat:42.5139, lng:141.2019,
@@ -321,67 +358,42 @@ const DAYS_V2 = [
         videos:[{title:"クッタラ湖・透明度日本一の火口湖 秘境探訪（日文）",url:"https://www.youtube.com/results?search_query=クッタラ湖+透明度+日本一+秘境"}]},
       { id:"usu_crater", name:"有珠山西山火口散策路（免費）", icon:"🌋",
         lat:42.5314, lng:140.8190,
-        desc:"2000年有珠山噴火災害遺跡！完全免費戶外散步道（約30-40分鐘），被溶岩吞沒的道路、地面隆起扭曲的住宅，宛如時間靜止的末日場景。晚上20:45洞爺湖煙火🎆",
+        desc:"2000年有珠山噴火災害遺跡！完全免費戶外散步道（約30-40分鐘），被熔岩吞沒的道路、地面隆起扭曲的住宅，宛如末日場景。晚上20:45洞爺湖煙火🎆",
         secret:"🔍 秘境度★★★★ 比有珠山纜車更震撼且免費，幾乎沒外國遊客知道",
         videos:[{title:"有珠山西山火口散策路・2000年噴火の生々しい痕跡（日文）",url:"https://www.youtube.com/results?search_query=有珠山+西山火口+散策路+2000年噴火+跡"}]}]},
-  { day:6, date:"7/7（二）", label:"洞爺湖→頭大仏→札幌", color:"#16a085",
-    spotCount:"移動＋1景點", hotelTag:"transfer", hotelLabel:"🚗 移動日 → 飯店③ 札幌（連住2晚）",
-    spots:[
-      { id:"hill_buddha", name:"頭大仏（滝野霊園・安藤忠雄）", icon:"🙏",
-        lat:42.9660, lng:141.3835,
-        desc:"安藤忠雄設計的隱秘建築傑作！13.5m的巨大佛頭從薰衣草丘陵中探出（7月正值盛開），蓮花穹頂長廊引導入場，光與影的空間體驗震撼人心。洞爺湖→頭大仏走道央道約1.5hr，門票¥500",
-        secret:"🔍 秘境度★★★★ 全球最被低估的安藤忠雄作品，外國人幾乎不知道",
-        videos:[
-          {title:"頭大仏殿・安藤忠雄の隠れた名作・薰衣草との共演（日文）",url:"https://www.youtube.com/results?search_query=頭大仏+滝野霊園+安藤忠雄+ラベンダー"},
-          {title:"北海道・滝野霊園 頭大仏 穴場スポット（日文）",url:"https://www.youtube.com/results?search_query=滝野霊園+頭大仏+穴場+観光"}]}]},
-  { day:7, date:"7/8（三）", label:"余市・積丹ブルー", color:"#27ae60",
-    spotCount:"景點×2", hotelTag:"h3", hotelLabel:"🏨 飯店③ 札幌（連住）",
-    spots:[
-      { id:"nikka", name:"余市・ニッカウヰスキー蒸留所", icon:"🏯",
-        lat:43.1850, lng:140.7794,
-        desc:"1934年創業、日本威士忌傳奇的誕生地。蘇格蘭風格石造建築群極美，免費參觀廠區！大人可試飲余市單一麥芽，孩子有免費蘋果汁。札幌→余市走後志自動車道約50分，幾乎無外國觀光客",
-        secret:"🔍 秘境度★★★ 外國遊客少，免費入場，性價比極高",
-        videos:[{title:"ニッカウヰスキー余市蒸留所・無料見学完全ガイド（日文）",url:"https://www.youtube.com/results?search_query=ニッカウヰスキー+余市+蒸留所+見学+無料"}]},
-      { id:"shimamui", name:"積丹・島武意海岸", icon:"🌊",
-        lat:43.2791, lng:140.5906,
-        desc:"「積丹藍（Shakotan Blue）」！穿過100m隧道豁然開朗，翡翠藍的透明海灣。全日本最美的海水之一，距離余市約30分鐘，外國遊客幾乎為零",
-        secret:"🔍 秘境度★★★★★ 外國人極少知道，積丹藍完全不輸沖繩",
-        videos:[
-          {title:"積丹・島武意海岸 神秘碧藍秘境 4K（日文）",url:"https://www.youtube.com/results?search_query=積丹+島武意海岸+青い海+絶景"},
-          {title:"積丹半島ドライブ・積丹ブルーの海岸線（日文）",url:"https://www.youtube.com/results?search_query=積丹半島+ドライブ+積丹ブルー+海"}]}]},
   { day:8, date:"7/9（四）", label:"回程", color:"#7f8c8d",
-    spotCount:"回程日", hotelTag:"h3", hotelLabel:"✈️ 札幌退房 → 国道36 → 新千歲回國",
+    spotCount:"回程日", hotelTag:"h3", hotelLabel:"✈️ 洞爺湖退房 → 登別 → 国道36 → 新千歲回國",
     spots:[
       { id:"cts_out", name:"新千歲機場 還車・回國", icon:"🛫",
         lat:42.7752, lng:141.6921,
-        desc:"IT235 12:05起飛。D8走免費 国道36（約55分），省下高速費¥1,430。札幌8:00出發→CTS 8:55→還車→Check-in by 10:00 ✓。機場3F哆啦A夢樂園・拉麵道場掃貨",
-        warn:"⚠️ 走国道36（免費）而非高速，節省¥1,430，出發提早30分即可",
+        desc:"IT235 12:05起飛。洞爺湖→登別→苫小牧→国道36→CTS，走免費国道全程約1.5hr，省高速費¥2,000+。洞爺湖8:30出發→CTS 10:00→還車→Check-in by 10:30 ✓。機場3F哆啦A夢樂園・拉麵道場掃貨",
+        warn:"⚠️ 走登別→苫小牧→国道36（免費），約1.5hr，省高速費¥2,000+",
         videos:[{title:"新千歲機場攻略・哆啦A夢樂園・拉麵道場・甜點（中文）",url:"https://www.youtube.com/results?search_query=新千歲機場+哆啦A夢+拉麵道場+甜點+攻略"}]}]}
 ];
 
 // ═══════════════════════════════════════════
 //  路線中繼點（OSRM 用 lat, lng 格式）
-//  OSRM 會依照這些節點自動找最佳道路
+//  逆時針環狀：CTS→富良野(NE)→小樽(W)→洞爺湖(SW)→CTS
 // ═══════════════════════════════════════════
 const ROUTE_WP_V1 = {
   1:[[42.7752,141.6921],[43.3219,142.3854]],
   2:[[43.3219,142.3854],[43.4196,142.4731],[43.4925,142.6407],[43.4942,142.6629],[43.3219,142.3854]],
   3:[[43.3219,142.3854],[43.7686,142.4805],[43.3219,142.3854]],
-  4:[[43.3219,142.3854],[42.4897,141.1497],[42.4955,141.1490],[42.5606,140.8407]],
-  5:[[42.5606,140.8407],[42.5430,140.8588],[42.5606,140.8407]],
-  6:[[42.5606,140.8407],[43.1419,141.4036],[43.0618,141.3541]],
-  7:[[43.0618,141.3541],[43.2236,140.9870],[43.1986,140.9947],[43.0618,141.3541]],
-  8:[[43.0618,141.3541],[42.887,141.567],[42.7752,141.6921]]
+  4:[[43.3219,142.3854],[43.7678,142.3606],[43.2236,140.9870]],
+  5:[[43.2236,140.9870],[43.1419,141.4036],[43.0551,141.3192],[43.2236,140.9870]],
+  6:[[43.2236,140.9870],[43.0618,141.3541],[42.5606,140.8407]],
+  7:[[42.5606,140.8407],[42.4897,141.1497],[42.4955,141.1490],[42.5606,140.8407]],
+  8:[[42.5606,140.8407],[42.4955,141.1490],[42.634,141.604],[42.7752,141.6921]]
 };
 const ROUTE_WP_V2 = {
   1:[[42.7752,141.6921],[43.3219,142.3854]],
   2:[[43.3219,142.3854],[43.3757,142.6809],[43.3409,142.4106],[43.3219,142.3854]],
   3:[[43.3219,142.3854],[43.7678,142.3606],[43.8085,143.0481],[43.3219,142.3854]],
-  4:[[43.3219,142.3854],[42.5460,141.3749],[42.5606,140.8407]],
-  5:[[42.5606,140.8407],[42.3110,141.0040],[42.5139,141.2019],[42.5314,140.8190],[42.5606,140.8407]],
-  6:[[42.5606,140.8407],[42.9660,141.3835],[43.0618,141.3541]],
-  7:[[43.0618,141.3541],[43.1850,140.7794],[43.2791,140.5906],[43.0618,141.3541]],
-  8:[[43.0618,141.3541],[42.887,141.567],[42.7752,141.6921]]
+  4:[[43.3219,142.3854],[43.196,141.776],[43.1850,140.7794],[43.2791,140.5906],[43.2236,140.9870]],
+  5:[[43.2236,140.9870],[42.9660,141.3835],[43.1986,140.9947]],
+  6:[[43.2236,140.9870],[42.634,141.604],[42.5460,141.3749],[42.5606,140.8407]],
+  7:[[42.5606,140.8407],[42.3110,141.0040],[42.5139,141.2019],[42.5314,140.8190],[42.5606,140.8407]],
+  8:[[42.5606,140.8407],[42.4955,141.1490],[42.634,141.604],[42.7752,141.6921]]
 };
 
 // ═══════════════════════════════════════════
@@ -552,14 +564,14 @@ function buildLegend(days){
     days.map(d=>`<div class="legend-item"><div class="legend-line" style="background:${d.color}"></div><span>D${d.day} ${d.label}</span></div>`).join('')+
     `<div class="legend-sep">── 住宿（換2次）</div>
      <div class="legend-item"><div class="legend-dot" style="background:#e74c3c"></div><span>① 富良野 D1-D3</span></div>
-     <div class="legend-item"><div class="legend-dot" style="background:#e67e22"></div><span>② 洞爺湖 D4-D5</span></div>
-     <div class="legend-item"><div class="legend-dot" style="background:#16a085"></div><span>③ 札幌 D6-D7</span></div>`;
+     <div class="legend-item"><div class="legend-dot" style="background:#2980b9"></div><span>② 小樽 D4-D5</span></div>
+     <div class="legend-item"><div class="legend-dot" style="background:#16a085"></div><span>③ 洞爺湖 D6-D7</span></div>`;
   document.getElementById('map').appendChild(leg);
   const strip=document.createElement('div');
   strip.className='hotel-strip';
   strip.innerHTML=`<div class="hotel-chip h1">🏨① 富良野 D1-D3</div>
-    <div class="hotel-chip h2">🏨② 洞爺湖 D4-D5</div>
-    <div class="hotel-chip h3">🏨③ 札幌 D6-D7</div>`;
+    <div class="hotel-chip h2">🏨② 小樽 D4-D5</div>
+    <div class="hotel-chip h3">🏨③ 洞爺湖 D6-D7</div>`;
   document.getElementById('map').appendChild(strip);
 }
 
